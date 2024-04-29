@@ -3,78 +3,77 @@ import {
   CustomRequest,
 } from "./../../middleware/jwtToken/authMiddleware";
 import Cart from "../models/cartModel";
-import Products from "../../admin/models/productModel";
+import Product from "../../admin/models/productModel";
 import {
   StatusCodes,
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
 
-interface CartItem {
-  productId: string;
-  quantity: number;
-  price: number;
-}
-
 // Add product to cart
-export const addToCart = async (req: CustomRequest) => {
+export const addToCart = async (
+  req: CustomRequest,
+  productId: string,
+  quantity: string
+) => {
   try {
     const user = req.user as userType;
     if (!user) {
-      return { status: 404, message: "User not found" };
-    }
-    const userId = user.userId;
-    const cartData = req.body;
-    const productsData = cartData.products;
-
-    if (!Array.isArray(productsData)) {
-      return { status: 400, message: "Invalid products data format" };
-    }
-    const productsPromises = productsData.map(async (productItem) => {
-      const { productName, quantity } = productItem;
-      const product = await Products.findOne({ productName: productName });
-      if (!product) {
-        return {
-          status: 404,
-          message: `Product '${productName}' not found`,
-        };
-      }
       return {
-        productId: product._id,
-        quantity: quantity,
-        price: product.productPrice,
-      };
-    });
-    const productsResults = await Promise.all(productsPromises);
-    const errorProduct = productsResults.find(
-      (result) => result.status !== undefined
-    );
-    if (errorProduct) {
-      return errorProduct;
-    }
-    const products: CartItem[] = productsResults as unknown as CartItem[];
-    const totalAmount = products.reduce((acc, product) => {
-      return acc + product.price * product.quantity;
-    }, 0);
-    const newCartItem = {
-      buyerUserId: userId,
-      products: products,
-      totalAmount: totalAmount,
-    };
-    const savedCartItem = await Cart.create(newCartItem);
-    if (savedCartItem.id) {
-      return {
-        message: SuccessMessages.CartSuccess,
-        success: true,
-        status: StatusCodes.Success.Created,
-        data: savedCartItem,
-      };
-    } else {
-      return {
-        message: ErrorMessages.CartError,
+        message: ErrorMessages.UserNotFound,
         success: false,
         status: StatusCodes.ClientError.NotFound,
       };
+    }
+    const userId = user.userId;
+    const existingCartItem = await Cart.findOne({
+      buyerUserId: userId,
+      productId,
+    });
+    if (existingCartItem) {
+      if (
+        existingCartItem.quantity !== null &&
+        existingCartItem.quantity !== undefined
+      ) {
+        existingCartItem.quantity += parseInt(quantity);
+      }
+      const updatedCartItem = await existingCartItem.save();
+      return {
+        message: SuccessMessages.CartSuccess,
+        success: true,
+        status: StatusCodes.Success.Ok,
+        data: updatedCartItem,
+      };
+    } else {
+      const product = await Product.findOne({ _id: productId });
+      if (!product) {
+        return {
+          message: ErrorMessages.ProductNotFound,
+          success: false,
+          status: StatusCodes.ClientError.NotFound,
+        };
+      }
+
+      const newCartItem = new Cart({
+        buyerUserId: userId,
+        productId,
+        quantity,
+      });
+      const savedCartItem = await newCartItem.save();
+      if (savedCartItem) {
+        return {
+          message: SuccessMessages.CartSuccess,
+          success: true,
+          status: StatusCodes.Success.Created,
+          data: savedCartItem,
+        };
+      } else {
+        return {
+          message: ErrorMessages.CartError,
+          success: false,
+          status: StatusCodes.ClientError.NotFound,
+        };
+      }
     }
   } catch (error) {
     console.error("Error in creating cart", error);
@@ -86,31 +85,76 @@ export const addToCart = async (req: CustomRequest) => {
   }
 };
 
-export const getAllCartIteams = async (page: number, limit: number) => {
+// Get user all cart items
+export const getAllCartIteams = async (req: CustomRequest) => {
   try {
-    const skip = (page - 1) * limit;
-    const totalCount = await Cart.countDocuments();
-    const allCarts = await Cart.find().skip(skip).limit(limit);
-    if (allCarts.length > 0) {
+    const user = req.user as userType;
+    if (!user) {
       return {
-        message: SuccessMessages.CartFoundSuccess,
-        status: StatusCodes.DataFound.Found,
-        success: true,
-        data: {
-          products: allCarts,
-          totalCount,
-          currentPage: page,
-          totalPages: Math.ceil(totalCount / limit),
-        },
-      };
-    } else {
-      return {
-        message: ErrorMessages.ProductError,
+        message: ErrorMessages.UserNotFound,
         success: false,
         status: StatusCodes.ClientError.NotFound,
       };
     }
+    const userId = user.userId;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const totalCount = await Cart.countDocuments({ buyerUserId: userId });
+
+    const skip = (page - 1) * limit;
+
+    const cartItems = await Cart.find({ buyerUserId: userId })
+      .skip(skip)
+      .limit(limit);
+
+    let totalCartAmount = 0;
+    const cartPromises = cartItems.map(async (cartItem) => {
+      const product = await Product.findById(cartItem.productId);
+      if (!product) {
+        return {
+          message: ErrorMessages.ProductNotFound,
+          success: false,
+          status: StatusCodes.ClientError.NotFound,
+        };
+      }
+      if (
+        product.productPrice !== null &&
+        product.productPrice !== undefined &&
+        cartItem.quantity !== null &&
+        cartItem.quantity !== undefined
+      ) {
+        const itemPrice = product.productPrice * cartItem.quantity;
+        totalCartAmount += itemPrice;
+        return {
+          cartItem: cartItem,
+          itemPrice: itemPrice,
+        };
+      } else {
+        return {
+          message: ErrorMessages.ProductNotFound,
+          success: false,
+          status: StatusCodes.ClientError.NotFound,
+        };
+      }
+    });
+
+    const cartResults = await Promise.all(cartPromises);
+
+    return {
+      message: SuccessMessages.CartFoundSuccess,
+      success: true,
+      status: StatusCodes.Success.Ok,
+      data: {
+        cartItems: cartResults,
+        totalCartAmount: totalCartAmount,
+        totalCount: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        currentPage: page,
+      },
+    };
   } catch (error) {
+    console.error("Error in getting user cart items", error);
     return {
       message: ErrorMessages.CartError,
       success: false,

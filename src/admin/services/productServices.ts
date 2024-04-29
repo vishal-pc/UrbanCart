@@ -103,3 +103,80 @@ export const getAllProducts = async (page: number, limit: number) => {
     };
   }
 };
+
+// Update a product by ID
+export const updateProductById = async (
+  productId: string,
+  updatedData: any,
+  file: Express.Multer.File
+) => {
+  try {
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return {
+        message: ErrorMessages.ProductNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    if (file) {
+      const tempPath = file.path;
+      const uploadResult = await cloudinary.uploader.upload(tempPath);
+      const secure_url = uploadResult.secure_url;
+      product.productImg = secure_url;
+    }
+
+    if (updatedData.productName) product.productName = updatedData.productName;
+    if (updatedData.productPrice)
+      product.productPrice = updatedData.productPrice;
+    if (updatedData.productDescription)
+      product.productDescription = updatedData.productDescription;
+
+    const updatedProduct = await product.save();
+
+    return {
+      message: SuccessMessages.ProductUpdatedSuccess,
+      success: true,
+      status: StatusCodes.Success.Ok,
+      data: updatedProduct,
+    };
+  } catch (error) {
+    console.error("Error in updating product", error);
+    return {
+      message: ErrorMessages.ProductUpdateError,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Delete a product by ID
+export const deleteProductById = async (productId: string) => {
+  try {
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return {
+        message: ErrorMessages.ProductNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+
+    await product.deleteOne();
+
+    return {
+      message: SuccessMessages.ProductDeletedSuccess,
+      success: true,
+      status: StatusCodes.Success.Ok,
+    };
+  } catch (error) {
+    console.error("Error in deleting product", error);
+    return {
+      message: ErrorMessages.ProductDeleteError,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};

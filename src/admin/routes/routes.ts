@@ -41,5 +41,16 @@ adminRouter.get(
   [verifyAuthToken],
   productController.getAllProducts
 );
+adminRouter.patch(
+  "/update-product/:productId",
+  [verifyAuthToken, verifyAdminToken],
+  upload.single("productImg"),
+  productController.updateProductById
+);
+adminRouter.delete(
+  "/delete-product/:productId",
+  [verifyAuthToken, verifyAdminToken],
+  productController.deleteProductById
+);
 
 export default adminRouter;

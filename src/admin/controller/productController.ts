@@ -40,3 +40,44 @@ export const getAllProducts = async (req: Request, res: Response) => {
     };
   }
 };
+
+// Update a product by ID
+export const updateProductById = async (req: Request, res: Response) => {
+  const productId = req.params.productId;
+  const updatedData = req.body;
+  const file = req.file as Express.Multer.File | undefined;
+
+  try {
+    const updatedProduct = await productServices.updateProductById(
+      productId,
+      updatedData,
+      file as Express.Multer.File
+    );
+
+    return res.status(updatedProduct.status).json(updatedProduct);
+  } catch (error) {
+    console.error("Error in updating product", error);
+    return {
+      message: ErrorMessages.ProductError,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Delete a product by ID
+export const deleteProductById = async (req: Request, res: Response) => {
+  const productId = req.params.productId;
+
+  try {
+    const deletedProduct = await productServices.deleteProductById(productId);
+    return res.status(deletedProduct.status).json(deletedProduct);
+  } catch (error) {
+    console.error("Error in deleting product", error);
+    return {
+      message: ErrorMessages.ProductError,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};

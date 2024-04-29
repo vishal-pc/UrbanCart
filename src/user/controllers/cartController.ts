@@ -5,7 +5,8 @@ import { StatusCodes, ErrorMessages } from "../../validation/responseMessages";
 // Add products to cart
 export const addToCart = async (req: Request, res: Response) => {
   try {
-    const result = await cartService.addToCart(req);
+    const { productId, quantity } = req.body;
+    const result = await cartService.addToCart(req, productId, quantity);
     return res
       .status(result.status || StatusCodes.ServerError.InternalServerError)
       .json(result);
@@ -19,10 +20,8 @@ export const addToCart = async (req: Request, res: Response) => {
 
 // Get all iteams in the cart
 export const getAllCartIteams = async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
   try {
-    const allProducts = await cartService.getAllCartIteams(page, limit);
+    const allProducts = await cartService.getAllCartIteams(req);
     return res.status(allProducts.status).json(allProducts);
   } catch (error) {
     console.error("Error in cart products", error);
