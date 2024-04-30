@@ -9,6 +9,7 @@ export interface CustomRequest extends Request {
 }
 
 export interface userType {
+  exp: number;
   userId: string | JwtPayload;
   type: string;
 }
@@ -21,74 +22,62 @@ export const verifyAuthToken = (
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return {
+    return res.status(StatusCodes.ClientError.NotFound).json({
       message: ErrorMessages.AuthorizeError,
       success: false,
-      status: StatusCodes.ClientError.NotFound,
-    };
+    });
   }
 
   const token = authHeader.split(" ")[1];
 
   if (!token) {
-    return {
+    return res.status(StatusCodes.ClientError.BadRequest).json({
       message: ErrorMessages.AuthenticatError,
       success: false,
-      status: StatusCodes.ClientError.BadRequest,
-    };
+    });
   }
 
   try {
-    const decodedToken = jwt.verify(token, envConfig.Jwt_Secret);
+    const decodedToken = jwt.verify(token, envConfig.Jwt_Secret) as userType;
 
-    if (typeof decodedToken !== "object" || decodedToken === null) {
-      return {
+    if (!decodedToken) {
+      return res.status(StatusCodes.ClientError.NotFound).json({
         message: ErrorMessages.TokenError,
         success: false,
-        status: StatusCodes.ClientError.NotFound,
-      };
+      });
     }
+
     const currentTime = Math.floor(Date.now() / 1000);
     if (decodedToken.exp && decodedToken.exp < currentTime) {
-      return {
+      return res.status(StatusCodes.ClientError.BadRequest).json({
         message: ErrorMessages.TokenExpire,
         success: false,
-        status: StatusCodes.ClientError.BadRequest,
-      };
+      });
     }
-    req.user = decodedToken as userType;
 
+    req.user = decodedToken;
     next();
   } catch (error) {
-    return {
-      message: ErrorMessages.AuthenticatError,
+    return res.status(StatusCodes.ClientError.NotFound).json({
+      message: ErrorMessages.TokenError,
       success: false,
-      status: StatusCodes.ClientError.NotFound,
-    };
+    });
   }
 };
 
-export const verifyAdminToken = async (
+export const verifyAdminToken = (
   req: CustomRequest,
   res: Response,
   next: NextFunction
 ) => {
-  try {
-    const user = req.user as userType;
-    if (user.type === "admin") {
-      next();
-    } else {
-      return {
-        message: ErrorMessages.AccessError,
-        success: false,
-        status: StatusCodes.ClientError.NotFound,
-      };
-    }
-  } catch (err) {
-    return {
-      message: ErrorMessages.TokenError,
+  const user = req.user as userType;
+
+  if (!user || user.type !== "admin") {
+    return res.status(StatusCodes.ClientError.NotFound).json({
+      message: ErrorMessages.AccessError,
       success: false,
-      status: StatusCodes.ClientError.BadRequest,
-    };
+    });
   }
+
+  next();
 };
