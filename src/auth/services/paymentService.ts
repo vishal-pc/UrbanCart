@@ -1,5 +1,4 @@
 import Payment from "../models/paymentModel";
-import Cart from "../models/cartModel";
 import {
   StatusCodes,
   ErrorMessages,

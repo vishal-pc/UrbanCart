@@ -73,7 +73,7 @@ export const verifyAdminToken = (
   const user = req.user as userType;
 
   if (!user || user.type !== "admin") {
-    return res.status(StatusCodes.ClientError.NotFound).json({
+    return res.status(StatusCodes.ClientError.Unauthorized).json({
       message: ErrorMessages.AccessError,
       success: false,
     });
