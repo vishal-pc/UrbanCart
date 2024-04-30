@@ -30,7 +30,7 @@ app.get("/", (req: Request, res: Response) => {
     },
     function (err: any, data: any) {
       if (err) {
-        console.log(ErrorMessages.SomethingWentWrong);
+        res.send(ErrorMessages.SomethingWentWrong);
       }
       res.send(`<pre>${data}</pre>`);
     }
