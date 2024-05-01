@@ -5,12 +5,26 @@ import {
   ErrorMessages,
 } from "../../validation/responseMessages";
 import cloudinary from "../../middleware/cloud/cloudnery";
+import {
+  CustomRequest,
+  userType,
+} from "../../middleware/jwtToken/authMiddleware";
 
 // Create a new product
 export const createProduct = async (
+  req: CustomRequest,
   productData: any,
   file: Express.Multer.File
 ) => {
+  const user = req.user as userType;
+  if (!user) {
+    return {
+      message: ErrorMessages.UserNotFound,
+      success: false,
+      status: StatusCodes.ClientError.NotFound,
+    };
+  }
+  const userId = user.userId;
   const { productName, productPrice, productDescription } = productData;
   const tempPath = file?.path;
   try {
@@ -43,6 +57,7 @@ export const createProduct = async (
       productPrice,
       productDescription,
       productImg: secure_url,
+      createdBy: userId,
     };
 
     const productSaved = await Product.create(newProduct);

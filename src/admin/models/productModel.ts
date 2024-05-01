@@ -15,6 +15,9 @@ const productSchema = new Schema(
     productDescription: {
       type: String,
     },
+    createdBy: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

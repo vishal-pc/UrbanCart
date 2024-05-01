@@ -8,6 +8,10 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
+import {
+  CustomRequest,
+  userType,
+} from "../../middleware/jwtToken/authMiddleware";
 
 // Register admin
 export const registerAdmin = async (adminData: any) => {
@@ -139,6 +143,51 @@ export const loginAdmin = async (adminData: any) => {
     console.error("Error in login", error);
     return {
       message: ErrorMessages.LoginError,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Get admin user By id
+export const getAdminById = async (req: CustomRequest) => {
+  try {
+    const user = req.user as userType;
+    if (!user) {
+      return {
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const userId = user.userId;
+    const foundedUser = await Admin.findById({ _id: userId });
+    if (!foundedUser) {
+      return {
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const userData = {
+      _id: foundedUser.id,
+      fullName: foundedUser.fullName,
+      email: foundedUser.email,
+      type: foundedUser.type,
+      IsAdmin: foundedUser.IsAdmin,
+      createdAt: foundedUser.createdAt,
+      updatedAt: foundedUser.updatedAt,
+    };
+    return {
+      message: SuccessMessages.UserFound,
+      status: StatusCodes.Success.Ok,
+      success: true,
+      userData,
+    };
+  } catch (error) {
+    console.error("Error in getting user by id", error);
+    return {
+      message: ErrorMessages.UserNotFound,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

@@ -9,6 +9,7 @@ const authRouter = express.Router();
 // Auth routes
 authRouter.post("/register", authController.authRegister);
 authRouter.post("/login", authController.authLogin);
+authRouter.get("/get-user", [verifyAuthToken], authController.getUserById);
 
 // Cart routes
 authRouter.post("/add-to-cart", [verifyAuthToken], cartController.addToCart);

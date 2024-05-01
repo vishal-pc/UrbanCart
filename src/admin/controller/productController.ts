@@ -9,6 +9,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
   try {
     const createdProduct = await productServices.createProduct(
+      req,
       productData,
       file as Express.Multer.File
     );

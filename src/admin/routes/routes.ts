@@ -28,6 +28,11 @@ const upload = multer({ storage: storage });
 // Admin routes
 adminRouter.post("/register", adminController.adminRegister);
 adminRouter.post("/login", adminController.loginAdmin);
+adminRouter.get(
+  "/get-admin",
+  [verifyAuthToken, verifyAdminToken],
+  adminController.getAdminById
+);
 
 // Product routes
 adminRouter.post(

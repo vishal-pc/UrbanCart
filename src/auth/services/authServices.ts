@@ -8,6 +8,10 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
+import {
+  CustomRequest,
+  userType,
+} from "../../middleware/jwtToken/authMiddleware";
 
 export const authRegister = async (userData: any) => {
   const { fullName, email, password } = userData;
@@ -134,6 +138,49 @@ export const authLogin = async (userData: any) => {
     console.error("Error in user login", error);
     return {
       message: ErrorMessages.LoginError,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Get auth user By id
+export const getUserById = async (req: CustomRequest) => {
+  try {
+    const user = req.user as userType;
+    if (!user) {
+      return {
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const userId = user.userId;
+    const foundedUser = await Auth.findById({ _id: userId });
+    if (!foundedUser) {
+      return {
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const userData = {
+      _id: foundedUser.id,
+      fullName: foundedUser.fullName,
+      email: foundedUser.email,
+      createdAt: foundedUser.createdAt,
+      updatedAt: foundedUser.updatedAt,
+    };
+    return {
+      message: SuccessMessages.UserFound,
+      status: StatusCodes.Success.Ok,
+      success: true,
+      userData,
+    };
+  } catch (error) {
+    console.error("Error in getting user by id", error);
+    return {
+      message: ErrorMessages.UserNotFound,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

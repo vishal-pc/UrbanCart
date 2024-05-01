@@ -29,3 +29,18 @@ export const authLogin = async (req: Request, res: Response) => {
     };
   }
 };
+
+// Get auth user By id
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const result = await authService.getUserById(req);
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.error("Error in getting user by id", error);
+    return {
+      message: ErrorMessages.UserNotFound,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};

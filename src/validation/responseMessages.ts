@@ -31,6 +31,7 @@ export const SuccessMessages = {
   CartItemUpdated: "Cart Updated",
   CartRemove: "Iteam removed",
   PaymentSuccess: "Payment successful",
+  UserFound: "User found",
 };
 
 export const ErrorMessages = {
@@ -38,7 +39,7 @@ export const ErrorMessages = {
   DatabaseError: "Database not connected...🥱",
   AuthorizeError: "Authorization header not found",
   AuthenticatError: "You are not authenticated!",
-  TokenError: "Invalid token!",
+  TokenError: "Invalid token or token has expired",
   AccessError: "Unauthorized Access",
   TokenExpire: "Token has expired",
   UserNotFound: "User not found",
