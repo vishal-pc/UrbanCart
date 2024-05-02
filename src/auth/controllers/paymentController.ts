@@ -14,7 +14,7 @@ export const processPayment = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error in payment", error);
     return {
-      message: ErrorMessages.PaymentError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

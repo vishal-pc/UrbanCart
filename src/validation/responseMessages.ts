@@ -58,6 +58,7 @@ export const ErrorMessages = {
   ProductNotFound: "Product not found",
   ProductInvalid: "Invalid products data format",
   ProductError: "Error in creating product",
+  ProductGetError: "Error in getting product",
   ProductUpdateError: "Error in updating product",
   ProductDeleteError: "Error in deleting product",
   CartError: "Error in creating cart",

@@ -59,7 +59,7 @@ export const updateProductById = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error in updating product", error);
     return {
-      message: ErrorMessages.ProductError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -76,7 +76,7 @@ export const deleteProductById = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error in deleting product", error);
     return {
-      message: ErrorMessages.ProductError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

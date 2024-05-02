@@ -14,7 +14,7 @@ export const addToCart = async (req: Request, res: Response) => {
     console.error(error);
     return res
       .status(StatusCodes.ServerError.InternalServerError)
-      .json({ message: ErrorMessages.ProductError });
+      .json({ message: ErrorMessages.SomethingWentWrong });
   }
 };
 
@@ -26,7 +26,7 @@ export const getAllCartIteams = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error in cart products", error);
     return {
-      message: ErrorMessages.ProductError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

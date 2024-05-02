@@ -9,7 +9,7 @@ export const authRegister = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error in register", error);
     return {
-      message: ErrorMessages.RegisterError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -23,7 +23,7 @@ export const authLogin = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error in login", error);
     return {
-      message: ErrorMessages.LoginError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

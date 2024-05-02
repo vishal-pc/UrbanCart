@@ -11,7 +11,7 @@ export const forgetPassword = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error in forget user password", error);
     return {
-      message: ErrorMessages.ForgotPasswordError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -32,7 +32,7 @@ export const resetPassword = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error in reset user password", error);
     return {
-      message: ErrorMessages.ResetPasswordsError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

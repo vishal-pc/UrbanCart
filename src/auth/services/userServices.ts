@@ -56,8 +56,8 @@ export const forgetPassword = async (email: string) => {
     console.error("Error in forget user password", error);
     return {
       message: ErrorMessages.SomethingWentWrong,
-      status: StatusCodes.ServerError.InternalServerError,
       success: false,
+      status: StatusCodes.ServerError.InternalServerError,
     };
   }
 };
@@ -116,8 +116,8 @@ export const resetPassword = async (
     console.error("Error in reset user password", error);
     return {
       message: ErrorMessages.SomethingWentWrong,
-      status: StatusCodes.ServerError.InternalServerError,
       success: false,
+      status: StatusCodes.ServerError.InternalServerError,
     };
   }
 };

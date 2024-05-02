@@ -80,7 +80,7 @@ export const registerAdmin = async (adminData: any) => {
   } catch (error) {
     console.error("Error in register", error);
     return {
-      message: ErrorMessages.RegisterError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -143,7 +143,7 @@ export const loginAdmin = async (adminData: any) => {
   } catch (error) {
     console.error("Error in login", error);
     return {
-      message: ErrorMessages.LoginError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -188,7 +188,7 @@ export const getAdminById = async (req: CustomRequest) => {
   } catch (error) {
     console.error("Error in getting user by id", error);
     return {
-      message: ErrorMessages.UserNotFound,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -222,7 +222,7 @@ export const getAllUsers = async () => {
   } catch (error) {
     console.error("Error in getting users", error);
     return {
-      message: ErrorMessages.UserNotFound,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

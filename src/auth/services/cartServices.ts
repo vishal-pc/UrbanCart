@@ -78,7 +78,7 @@ export const addToCart = async (
   } catch (error) {
     console.error("Error in creating cart", error);
     return {
-      message: ErrorMessages.CartError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -156,7 +156,7 @@ export const getAllCartIteams = async (req: CustomRequest) => {
   } catch (error) {
     console.error("Error in getting user cart items", error);
     return {
-      message: ErrorMessages.CartError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

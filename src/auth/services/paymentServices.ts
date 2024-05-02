@@ -50,7 +50,7 @@ export const processPayment = async (
   } catch (error) {
     console.error("Error in processing payment", error);
     return {
-      message: ErrorMessages.PaymentError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

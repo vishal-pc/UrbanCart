@@ -77,7 +77,7 @@ export const createProduct = async (
   } catch (error) {
     console.error("Error in creating product", error);
     return {
-      message: ErrorMessages.ProductError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -104,15 +104,15 @@ export const getAllProducts = async (page: number, limit: number) => {
       };
     } else {
       return {
-        message: ErrorMessages.ProductError,
+        message: ErrorMessages.ProductGetError,
         success: false,
-        status: StatusCodes.ClientError.NotFound,
+        status: StatusCodes.ClientError.BadRequest,
       };
     }
   } catch (error) {
     console.error("Error in getting all products", error);
     return {
-      message: ErrorMessages.ProductError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -159,7 +159,7 @@ export const updateProductById = async (
   } catch (error) {
     console.error("Error in updating product", error);
     return {
-      message: ErrorMessages.ProductUpdateError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -189,7 +189,7 @@ export const deleteProductById = async (productId: string) => {
   } catch (error) {
     console.error("Error in deleting product", error);
     return {
-      message: ErrorMessages.ProductDeleteError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };

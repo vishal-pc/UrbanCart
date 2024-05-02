@@ -78,7 +78,7 @@ export const authRegister = async (userData: any) => {
   } catch (error) {
     console.error("Error in user register", error);
     return {
-      message: ErrorMessages.RegisterError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -137,7 +137,7 @@ export const authLogin = async (userData: any) => {
   } catch (error) {
     console.error("Error in user login", error);
     return {
-      message: ErrorMessages.LoginError,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
@@ -180,7 +180,7 @@ export const getUserById = async (req: CustomRequest) => {
   } catch (error) {
     console.error("Error in getting user by id", error);
     return {
-      message: ErrorMessages.UserNotFound,
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     };
