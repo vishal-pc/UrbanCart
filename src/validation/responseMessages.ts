@@ -3,6 +3,9 @@ export const StatusCodes = {
     Created: 201,
     Ok: 200,
   },
+  DataFound: {
+    Found: 302,
+  },
   ClientError: {
     BadRequest: 400,
     Unauthorized: 401,
@@ -32,6 +35,7 @@ export const SuccessMessages = {
   ForgotPasswordSuccess:
     "Reset password OTP has been sent to your email address",
   ResetPasswordsSuccess: "password reset successfully",
+  DataFound: "Data found",
 };
 
 export const ErrorMessages = {
@@ -67,5 +71,6 @@ export const ErrorMessages = {
   ForgotPasswordError: "Faild to send password link",
   ResetPasswordsError: "Faild to reset password",
   PasswordSameError: "Confirm password and password must be same",
-  OtpError: "Invalid OTP",
+  OtpError: "Invalid OTP or OTP Expired",
+  DataError: "Data not found",
 };

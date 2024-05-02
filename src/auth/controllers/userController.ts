@@ -26,7 +26,8 @@ export const resetPassword = async (req: Request, res: Response) => {
       email,
       otp,
       newPassword,
-      confirmPassword
+      confirmPassword,
+      req
     );
     res.json(result);
   } catch (error) {

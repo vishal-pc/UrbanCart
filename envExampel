@@ -1,0 +1,28 @@
+# Server Port
+Port = 
+
+# Mongo db credentials
+Mongo_DB_Name = 
+Mongo_DB_Pass = 
+
+# Express session secrete key
+Express_Secret = 
+
+# Jwt secrete 
+Jwt_Secret = 
+Jwt_Expiry_Hours = 
+
+# Cloudnary credentials for file upload
+Cloudnary_Cloud_Name = 
+Cloudnary_Api_Key = 
+Cloudnary_Secret_key = 
+
+# Email credentials for sending Email
+Mail_Host = 
+Mail_Port = 
+Mail_Username =
+Mail_Password = 
+Mail_From = 
+
+# Redirection to client urls
+Reset_Password = 

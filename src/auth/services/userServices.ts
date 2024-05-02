@@ -1,3 +1,6 @@
+import express, { Request } from "express";
+import fs from "fs";
+import path from "path";
 import Auth from "../models/authModel";
 import bcrypt from "bcryptjs";
 import { envConfig } from "../../config/envConfig";
@@ -8,7 +11,12 @@ import {
   ErrorMessages,
 } from "../../validation/responseMessages";
 import { passwordRegex } from "../../helpers/helper";
-import { passwordResetTemplate } from "../../middleware/mail/emailTemplates";
+
+const router = express.Router();
+router.use(express.static("public"));
+
+const mailTemplatePath = path.join(__dirname, "../../public/mailTemplate.html");
+const mailTemplate = fs.readFileSync(mailTemplatePath, "utf-8");
 
 const otpStore: any = {};
 
@@ -19,6 +27,8 @@ export const forgetPassword = async (email: string) => {
       const otp = Math.floor(1000 + Math.random() * 9000);
       return otp.toString();
     };
+    const otpExpire = 2 * 60 * 1000;
+
     const user = await Auth.findOne({ email: email });
     if (!user) {
       return {
@@ -28,13 +38,17 @@ export const forgetPassword = async (email: string) => {
       };
     }
     const otp = generateOTP();
-    otpStore[email] = otp;
+    otpStore[email] = { otp, expiresAt: Date.now() + otpExpire };
+
+    const emailContent = mailTemplate
+      .replace("${fullName}", user.fullName)
+      .replace("${otp}", otp);
 
     const mailOptions = {
       from: envConfig.Mail_From,
       to: user.email || "",
       subject: "Reset Password",
-      html: passwordResetTemplate(user.fullName, otp),
+      html: emailContent,
     };
 
     transporter.sendMail(mailOptions, (err) => {
@@ -67,9 +81,21 @@ export const resetPassword = async (
   email: string,
   otp: string,
   newPassword: string,
-  confirmPassword: string
+  confirmPassword: string,
+  req: Request
 ) => {
   try {
+    const requiredFields = ["otp", "email", "newPassword", "confirmPassword"];
+    const missingFields = requiredFields.filter((field) => !req.body[field]);
+
+    if (missingFields.length > 0) {
+      const missingFieldsMessage = missingFields.join(", ");
+      return {
+        message: ErrorMessages.MissingFields(missingFieldsMessage),
+        success: false,
+        status: StatusCodes.ClientError.BadRequest,
+      };
+    }
     const existingUser = await Auth.findOne({ email });
     if (!existingUser) {
       return {
@@ -79,7 +105,7 @@ export const resetPassword = async (
       };
     }
     const storedOTP = otpStore[email];
-    if (!storedOTP || otp !== storedOTP) {
+    if (!storedOTP || storedOTP.otp !== otp) {
       return {
         message: ErrorMessages.OtpError,
         status: StatusCodes.ClientError.NotFound,

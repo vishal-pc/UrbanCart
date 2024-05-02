@@ -181,7 +181,7 @@ export const getAdminById = async (req: CustomRequest) => {
     };
     return {
       message: SuccessMessages.UserFound,
-      status: StatusCodes.Success.Ok,
+      status: StatusCodes.DataFound.Found,
       success: true,
       userData,
     };
@@ -215,7 +215,7 @@ export const getAllUsers = async () => {
     }));
     return {
       message: SuccessMessages.UserFound,
-      status: StatusCodes.Success.Ok,
+      status: StatusCodes.DataFound.Found,
       success: true,
       userData,
     };
