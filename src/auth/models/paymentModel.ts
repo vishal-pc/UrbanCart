@@ -1,6 +1,18 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
-const paymentSchema = new mongoose.Schema(
+export interface IPayment extends Document {
+  buyerUserId: string;
+  totalProduct: Array<{
+    productId: mongoose.Types.ObjectId;
+    cartId: mongoose.Types.ObjectId;
+  }>;
+  totalCartAmount: number;
+  paymentStatus: "Pending" | "Completed";
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const PaymentSchema = new mongoose.Schema(
   {
     buyerUserId: {
       type: String,
@@ -29,5 +41,5 @@ const paymentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Payment = mongoose.model("Payment", paymentSchema);
+const Payment = mongoose.model<IPayment>("Payment", PaymentSchema);
 export default Payment;

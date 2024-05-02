@@ -3,9 +3,6 @@ export const StatusCodes = {
     Created: 201,
     Ok: 200,
   },
-  DataFound: {
-    Found: 302,
-  },
   ClientError: {
     BadRequest: 400,
     Unauthorized: 401,
@@ -32,6 +29,9 @@ export const SuccessMessages = {
   CartRemove: "Iteam removed",
   PaymentSuccess: "Payment successful",
   UserFound: "User found",
+  ForgotPasswordSuccess:
+    "Reset password OTP has been sent to your email address",
+  ResetPasswordsSuccess: "password reset successfully",
 };
 
 export const ErrorMessages = {
@@ -44,6 +44,7 @@ export const ErrorMessages = {
   TokenExpire: "Token has expired",
   UserNotFound: "User not found",
   EmailInvalid: "Invalid email format",
+  EmalNotFound: "Email not found",
   UserExists: (email: string) => `This email ${email} is already exists`,
   IncorrectCredentials: "Incorrect email or password",
   PasswordRequirements:
@@ -61,6 +62,9 @@ export const ErrorMessages = {
   ProductDeleteError: "Error in deleting product",
   CartError: "Error in creating cart",
   CartNotFound: "Cart not found",
-
   PaymentError: "Error in creating payment",
+  ForgotPasswordError: "Faild to send password link",
+  ResetPasswordsError: "Faild to reset password",
+  PasswordSameError: "Confirm password and password must be same",
+  OtpError: "Invalid OTP",
 };

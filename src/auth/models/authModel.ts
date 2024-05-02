@@ -1,7 +1,14 @@
-import mongoose from "mongoose";
-const { Schema } = mongoose;
+import mongoose, { Document } from "mongoose";
 
-const authSchema = new Schema(
+export interface IAuth extends Document {
+  fullName: string;
+  email: string;
+  password: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const authSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
@@ -16,5 +23,5 @@ const authSchema = new Schema(
   { timestamps: true }
 );
 
-const Auth = mongoose.model("Auth", authSchema);
+const Auth = mongoose.model<IAuth>("Auth", authSchema);
 export default Auth;

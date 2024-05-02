@@ -1,7 +1,7 @@
 import {
   userType,
   CustomRequest,
-} from "./../../middleware/jwtToken/authMiddleware";
+} from "../../middleware/jwtToken/authMiddleware";
 import Cart from "../models/cartModel";
 import Product from "../../admin/models/productModel";
 import {

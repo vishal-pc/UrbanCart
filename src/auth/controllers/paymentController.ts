@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as paymentService from "../services/paymentService";
+import * as paymentService from "../services/paymentServices";
 import { StatusCodes, ErrorMessages } from "../../validation/responseMessages";
 
 export const processPayment = async (req: Request, res: Response) => {

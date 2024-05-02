@@ -46,3 +46,18 @@ export const getAdminById = async (req: Request, res: Response) => {
     };
   }
 };
+
+// Get all users
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const result = await adminServices.getAllUsers();
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.error("Error in getting users", error);
+    return {
+      message: ErrorMessages.UserNotFound,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};

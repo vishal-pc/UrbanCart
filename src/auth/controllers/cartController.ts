@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as cartService from "../services/cartService";
+import * as cartService from "../services/cartServices";
 import { StatusCodes, ErrorMessages } from "../../validation/responseMessages";
 
 // Add products to cart

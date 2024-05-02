@@ -33,6 +33,11 @@ adminRouter.get(
   [verifyAuthToken, verifyAdminToken],
   adminController.getAdminById
 );
+adminRouter.get(
+  "/get-all-users",
+  [verifyAuthToken, verifyAdminToken],
+  adminController.getAllUsers
+);
 
 // Product routes
 adminRouter.post(

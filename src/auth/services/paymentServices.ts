@@ -7,7 +7,7 @@ import {
 import {
   userType,
   CustomRequest,
-} from "./../../middleware/jwtToken/authMiddleware";
+} from "../../middleware/jwtToken/authMiddleware";
 
 // Process payment and save payment details
 export const processPayment = async (

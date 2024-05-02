@@ -12,6 +12,7 @@ import {
   CustomRequest,
   userType,
 } from "../../middleware/jwtToken/authMiddleware";
+import Auth, { IAuth } from "../../auth/models/authModel";
 
 // Register admin
 export const registerAdmin = async (adminData: any) => {
@@ -186,6 +187,40 @@ export const getAdminById = async (req: CustomRequest) => {
     };
   } catch (error) {
     console.error("Error in getting user by id", error);
+    return {
+      message: ErrorMessages.UserNotFound,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Get all users
+export const getAllUsers = async () => {
+  try {
+    const users = await Auth.find();
+    if (!users) {
+      return {
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const userData = users.map((user: IAuth) => ({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    }));
+    return {
+      message: SuccessMessages.UserFound,
+      status: StatusCodes.Success.Ok,
+      success: true,
+      userData,
+    };
+  } catch (error) {
+    console.error("Error in getting users", error);
     return {
       message: ErrorMessages.UserNotFound,
       success: false,

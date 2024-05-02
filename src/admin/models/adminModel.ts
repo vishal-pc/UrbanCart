@@ -1,7 +1,16 @@
-import mongoose from "mongoose";
-const { Schema } = mongoose;
+import mongoose, { Document } from "mongoose";
 
-const adminSchema = new Schema(
+export interface IAdmin extends Document {
+  fullName: string;
+  email: string;
+  password: string;
+  type: string;
+  IsAdmin: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const AdminSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
@@ -23,5 +32,5 @@ const adminSchema = new Schema(
   { timestamps: true }
 );
 
-const Admin = mongoose.model("Admin", adminSchema);
+const Admin = mongoose.model<IAdmin>("Admin", AdminSchema);
 export default Admin;
