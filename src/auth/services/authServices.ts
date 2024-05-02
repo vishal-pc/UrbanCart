@@ -173,7 +173,7 @@ export const getUserById = async (req: CustomRequest) => {
     };
     return {
       message: SuccessMessages.UserFound,
-      status: StatusCodes.DataFound.Found,
+      status: StatusCodes.Success.Ok,
       success: true,
       userData,
     };

@@ -3,9 +3,6 @@ export const StatusCodes = {
     Created: 201,
     Ok: 200,
   },
-  DataFound: {
-    Found: 302,
-  },
   ClientError: {
     BadRequest: 400,
     Unauthorized: 401,

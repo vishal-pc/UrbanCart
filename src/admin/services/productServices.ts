@@ -93,7 +93,7 @@ export const getAllProducts = async (page: number, limit: number) => {
     if (allProducts.length > 0) {
       return {
         message: SuccessMessages.ProductFoundSuccess,
-        status: StatusCodes.DataFound.Found,
+        status: StatusCodes.Success.Ok,
         success: true,
         data: {
           products: allProducts,

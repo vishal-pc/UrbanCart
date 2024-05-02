@@ -144,7 +144,7 @@ export const getAllCartIteams = async (req: CustomRequest) => {
     return {
       message: SuccessMessages.CartFoundSuccess,
       success: true,
-      status: StatusCodes.DataFound.Found,
+      status: StatusCodes.Success.Ok,
       data: {
         cartItems: cartResults,
         totalCartAmount: totalCartAmount,
