@@ -9,18 +9,39 @@ const authRouter = express.Router();
 
 // Auth routes
 authRouter.post("/register", authController.authRegister);
-authRouter.post("/login", authController.authLogin);
-authRouter.get("/get-user", [verifyAuthToken], authController.getUserById);
+authRouter.get(
+  "/get-user",
+  verifyAuthToken(["user"]),
+  authController.getUserById
+);
 
 // Cart routes
-authRouter.post("/add-to-cart", [verifyAuthToken], cartController.addToCart);
-authRouter.get("/get-cart", [verifyAuthToken], cartController.getAllCartIteams);
+authRouter.post(
+  "/add-to-cart",
+  verifyAuthToken(["user"]),
+  cartController.addToCart
+);
+authRouter.get(
+  "/get-cart",
+  verifyAuthToken(["user"]),
+  cartController.getAllCartIteams
+);
+authRouter.get(
+  "/get-cart-item/:cartId",
+  verifyAuthToken(["user"]),
+  cartController.getUserCartItemById
+);
 
 // Payment routes
 authRouter.post(
   "/process-payment",
-  [verifyAuthToken],
+  verifyAuthToken(["user"]),
   paymentController.processPayment
+);
+authRouter.get(
+  "/get-payment/:paymentId",
+  verifyAuthToken(["user"]),
+  paymentController.getPaymentById
 );
 
 // User routes

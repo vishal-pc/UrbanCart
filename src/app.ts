@@ -9,6 +9,7 @@ const app = express();
 // Importing custom route and socket files
 import authRoute from "./auth/routes/routes";
 import adminRouter from "./admin/routes/routes";
+import loginRouter from "./login/loginRoutes";
 
 // Configuring CORS with specific options for allowed origins and methods
 app.use(configCors());
@@ -18,6 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Using custom API routes under the /api/v1 base path
+app.use("/api/v1/login", loginRouter);
 app.use("/api/v1/user", authRoute);
 app.use("/api/v1/admin", adminRouter);
 

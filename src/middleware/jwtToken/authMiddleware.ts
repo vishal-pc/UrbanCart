@@ -11,73 +11,68 @@ export interface CustomRequest extends Request {
 export interface userType {
   exp: number;
   userId: string | JwtPayload;
-  type: string;
+  fullName: string | JwtPayload;
+  role: {
+    role: string[];
+  };
 }
 
-export const verifyAuthToken = (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const authHeader = req.headers.authorization;
+export const verifyAuthToken =
+  (allowedRoles: string[]) =>
+  (req: CustomRequest, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization;
 
-  if (!authHeader) {
-    return res.status(StatusCodes.ClientError.NotFound).json({
-      message: ErrorMessages.AuthorizeError,
-      success: false,
-    });
-  }
+    if (!authHeader) {
+      return res.status(StatusCodes.ClientError.NotFound).json({
+        message: ErrorMessages.AuthorizeError,
+        success: false,
+      });
+    }
 
-  const token = authHeader.split(" ")[1];
+    const token = authHeader.split(" ")[1];
 
-  if (!token) {
-    return res.status(StatusCodes.ClientError.BadRequest).json({
-      message: ErrorMessages.AuthenticatError,
-      success: false,
-    });
-  }
+    if (!token) {
+      return res.status(StatusCodes.ClientError.BadRequest).json({
+        message: ErrorMessages.AuthenticatError,
+        success: false,
+      });
+    }
 
-  try {
-    const decodedToken = jwt.verify(token, envConfig.Jwt_Secret) as userType;
+    try {
+      const decodedToken = jwt.verify(token, envConfig.Jwt_Secret);
 
-    if (!decodedToken) {
+      if (typeof decodedToken !== "object" || decodedToken === null) {
+        return res.status(StatusCodes.ClientError.NotFound).json({
+          message: ErrorMessages.TokenError,
+          success: false,
+        });
+      }
+
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (decodedToken.exp && decodedToken.exp < currentTime) {
+        return res.status(StatusCodes.ClientError.BadRequest).json({
+          message: ErrorMessages.TokenExpire,
+          success: false,
+        });
+      }
+
+      req.user = decodedToken as userType;
+
+      const hasAllowedRole = allowedRoles.some(
+        (role) =>
+          decodedToken.role && decodedToken.role.role.indexOf(role) !== -1
+      );
+      if (!hasAllowedRole) {
+        return res.status(StatusCodes.ClientError.BadRequest).json({
+          message: ErrorMessages.AccessError,
+          success: false,
+        });
+      }
+      next();
+    } catch (error) {
       return res.status(StatusCodes.ClientError.NotFound).json({
         message: ErrorMessages.TokenError,
         success: false,
       });
     }
-
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (decodedToken.exp && decodedToken.exp < currentTime) {
-      return res.status(StatusCodes.ClientError.BadRequest).json({
-        message: ErrorMessages.TokenExpire,
-        success: false,
-      });
-    }
-
-    req.user = decodedToken;
-    next();
-  } catch (error) {
-    return res.status(StatusCodes.ClientError.NotFound).json({
-      message: ErrorMessages.TokenError,
-      success: false,
-    });
-  }
-};
-
-export const verifyAdminToken = (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const user = req.user as userType;
-
-  if (!user || user.type !== "admin") {
-    return res.status(StatusCodes.ClientError.Unauthorized).json({
-      message: ErrorMessages.AccessError,
-      success: false,
-    });
-  }
-
-  next();
-};
+  };

@@ -66,6 +66,7 @@ export const createProduct = async (
         message: SuccessMessages.ProductSuccess,
         status: StatusCodes.Success.Created,
         success: true,
+        productSaved,
       };
     } else {
       return {
@@ -109,6 +110,33 @@ export const getAllProducts = async (page: number, limit: number) => {
         status: StatusCodes.ClientError.BadRequest,
       };
     }
+  } catch (error) {
+    console.error("Error in getting all products", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Get product by id
+export const getProductById = async (productId: string) => {
+  try {
+    const getProduct = await Product.findById(productId);
+    if (!getProduct) {
+      return {
+        message: ErrorMessages.ProductNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    return {
+      message: SuccessMessages.ProductFoundSuccess,
+      status: StatusCodes.Success.Ok,
+      success: true,
+      getProduct,
+    };
   } catch (error) {
     console.error("Error in getting all products", error);
     return {

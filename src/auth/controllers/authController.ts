@@ -16,20 +16,6 @@ export const authRegister = async (req: Request, res: Response) => {
   }
 };
 
-export const authLogin = async (req: Request, res: Response) => {
-  try {
-    const result = await authService.authLogin(req.body);
-    return res.status(result.status).json(result);
-  } catch (error) {
-    console.error("Error in login", error);
-    return {
-      message: ErrorMessages.SomethingWentWrong,
-      success: false,
-      status: StatusCodes.ServerError.InternalServerError,
-    };
-  }
-};
-
 // Get auth user By id
 export const getUserById = async (req: Request, res: Response) => {
   try {

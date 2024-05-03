@@ -32,3 +32,19 @@ export const getAllCartIteams = async (req: Request, res: Response) => {
     };
   }
 };
+
+// Get user cart iteam by id
+export const getUserCartItemById = async (req: Request, res: Response) => {
+  try {
+    const cartId = req.params.cartId;
+    const allProducts = await cartService.getUserCartItemById(cartId, req);
+    return res.status(allProducts.status).json(allProducts);
+  } catch (error) {
+    console.error("Error in cart products", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};

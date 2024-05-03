@@ -17,21 +17,6 @@ export const adminRegister = async (req: Request, res: Response) => {
   }
 };
 
-// Admin login
-export const loginAdmin = async (req: Request, res: Response) => {
-  try {
-    const result = await adminServices.loginAdmin(req.body);
-    return res.status(result.status).json(result);
-  } catch (error) {
-    console.error("Error in login", error);
-    return {
-      message: ErrorMessages.SomethingWentWrong,
-      success: false,
-      status: StatusCodes.ServerError.InternalServerError,
-    };
-  }
-};
-
 // Get admin user By id
 export const getAdminById = async (req: Request, res: Response) => {
   try {

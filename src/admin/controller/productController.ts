@@ -42,6 +42,23 @@ export const getAllProducts = async (req: Request, res: Response) => {
   }
 };
 
+// Get a product by ID
+export const getProductById = async (req: Request, res: Response) => {
+  const productId = req.params.productId;
+
+  try {
+    const product = await productServices.getProductById(productId);
+    return res.status(product.status).json(product);
+  } catch (error) {
+    console.error("Error in getting product by id", error);
+    return {
+      message: ErrorMessages.ProductGetError,
+      success: false,
+      status: StatusCodes.ClientError.BadRequest,
+    };
+  }
+};
+
 // Update a product by ID
 export const updateProductById = async (req: Request, res: Response) => {
   const productId = req.params.productId;

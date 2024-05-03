@@ -126,10 +126,25 @@ export const getAllCartIteams = async (req: CustomRequest) => {
       ) {
         const itemPrice = product.productPrice * cartItem.quantity;
         totalCartAmount += itemPrice;
-        return {
-          cartItem: cartItem,
+
+        const customizedCartItem = {
+          _id: cartItem._id,
+          buyerUserId: cartItem.buyerUserId,
+          productDetails: {
+            productId: cartItem.productId,
+            productName: product.productName,
+            productPrice: product.productPrice,
+            productDescription: product.productDescription,
+            productImage: product.productImg,
+          },
+          quantity: cartItem.quantity,
+          createdAt: cartItem.createdAt,
+          updatedAt: cartItem.updatedAt,
+          __v: cartItem.__v,
           itemPrice: itemPrice,
         };
+
+        return customizedCartItem;
       } else {
         return {
           message: ErrorMessages.ProductNotFound,
@@ -151,6 +166,91 @@ export const getAllCartIteams = async (req: CustomRequest) => {
         totalCount: totalCount,
         totalPages: Math.ceil(totalCount / limit),
         currentPage: page,
+      },
+    };
+  } catch (error) {
+    console.error("Error in getting user cart items", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Get user cart item by id
+export const getUserCartItemById = async (
+  cartId: string,
+  req: CustomRequest
+) => {
+  try {
+    const user = req.user as userType;
+    if (!user) {
+      return {
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const userId = user.userId;
+
+    const cartItems = await Cart.find({ buyerUserId: userId, _id: cartId });
+
+    let totalCartAmount = 0;
+    const cartPromises = cartItems.map(async (cartItem) => {
+      const product = await Product.findById(cartItem.productId);
+      if (!product) {
+        return {
+          message: ErrorMessages.ProductNotFound,
+          success: false,
+          status: StatusCodes.ClientError.NotFound,
+        };
+      }
+      if (
+        product.productPrice !== null &&
+        product.productPrice !== undefined &&
+        cartItem.quantity !== null &&
+        cartItem.quantity !== undefined
+      ) {
+        const itemPrice = product.productPrice * cartItem.quantity;
+        totalCartAmount += itemPrice;
+
+        const customizedCartItem = {
+          _id: cartItem._id,
+          buyerUserId: cartItem.buyerUserId,
+          productDetails: {
+            productId: cartItem.productId,
+            productName: product.productName,
+            productPrice: product.productPrice,
+            productDescription: product.productDescription,
+            productImage: product.productImg,
+          },
+          quantity: cartItem.quantity,
+          createdAt: cartItem.createdAt,
+          updatedAt: cartItem.updatedAt,
+          __v: cartItem.__v,
+          itemPrice: itemPrice,
+        };
+
+        return customizedCartItem;
+      } else {
+        return {
+          message: ErrorMessages.ProductNotFound,
+          success: false,
+          status: StatusCodes.ClientError.NotFound,
+        };
+      }
+    });
+
+    const cartResults = await Promise.all(cartPromises);
+
+    return {
+      message: SuccessMessages.CartFoundSuccess,
+      success: true,
+      status: StatusCodes.Success.Ok,
+      data: {
+        cartItems: cartResults,
+        totalCartAmount: totalCartAmount,
       },
     };
   } catch (error) {

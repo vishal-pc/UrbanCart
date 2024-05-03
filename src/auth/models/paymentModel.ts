@@ -3,8 +3,13 @@ import mongoose, { Document } from "mongoose";
 export interface IPayment extends Document {
   buyerUserId: string;
   totalProduct: Array<{
-    productId: mongoose.Types.ObjectId;
-    cartId: mongoose.Types.ObjectId;
+    _id: any;
+    productId: string;
+    productName: string;
+    productPrice: number;
+    productQuentity: number;
+    productDescription: string;
+    cartId: string;
   }>;
   totalCartAmount: number;
   paymentStatus: "Pending" | "Completed";
@@ -20,12 +25,22 @@ const PaymentSchema = new mongoose.Schema(
     totalProduct: [
       {
         productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
+          type: String,
+        },
+        productName: {
+          type: String,
+        },
+        productPrice: {
+          type: Number,
+        },
+        productQuentity: {
+          type: Number,
+        },
+        productDescription: {
+          type: String,
         },
         cartId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Cart",
+          type: String,
         },
       },
     ],

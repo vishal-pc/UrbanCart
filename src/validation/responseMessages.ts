@@ -16,6 +16,7 @@ export const StatusCodes = {
 export const SuccessMessages = {
   ServerRunning: "Server is running... 🚀",
   DataBaseRunning: "Database Connected...👍️",
+  RoleCreated: "Role is created",
   SampelResponse: "Hello from Node js",
   RegisterSuccess: "Register successful",
   SignInSuccess: "Signed In successful",
@@ -28,6 +29,7 @@ export const SuccessMessages = {
   CartItemUpdated: "Cart Updated",
   CartRemove: "Iteam removed",
   PaymentSuccess: "Payment successful",
+  PaymentFoundSuccess: "Payment details found successfully",
   UserFound: "User found",
   ForgotPasswordSuccess:
     "Reset password OTP has been sent to your email address",
@@ -38,6 +40,9 @@ export const SuccessMessages = {
 export const ErrorMessages = {
   ServerError: "Server is not running...😴",
   DatabaseError: "Database not connected...🥱",
+  RoleError: "Error in creating role",
+  RoleNotFound: "Role not found",
+  RoleExist: "Role already exists",
   AuthorizeError: "Authorization header not found",
   AuthenticatError: "You are not authenticated!",
   TokenError: "Invalid token or token has expired",
@@ -64,7 +69,8 @@ export const ErrorMessages = {
   ProductDeleteError: "Error in deleting product",
   CartError: "Error in creating cart",
   CartNotFound: "Cart not found",
-  PaymentError: "Error in creating payment",
+  PaymentError: "Error in creating payment details",
+  PaymentNotFound: "Payment not found",
   ForgotPasswordError: "Faild to send password link",
   ResetPasswordsError: "Faild to reset password",
   PasswordSameError: "Confirm password and password must be same",
