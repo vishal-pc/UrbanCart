@@ -24,12 +24,17 @@ authRouter.post(
 authRouter.get(
   "/get-cart",
   verifyAuthToken(["user"]),
-  cartController.getAllCartIteams
+  cartController.getAllCartItems
 );
 authRouter.get(
   "/get-cart-item/:cartId",
   verifyAuthToken(["user"]),
   cartController.getUserCartItemById
+);
+authRouter.delete(
+  "/remove-cart-item/:cartItemId",
+  verifyAuthToken(["user"]),
+  cartController.removeProductQuantity
 );
 
 // Payment routes

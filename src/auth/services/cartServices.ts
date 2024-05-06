@@ -2,7 +2,7 @@ import {
   userType,
   CustomRequest,
 } from "../../middleware/jwtToken/authMiddleware";
-import Cart from "../models/cartModel";
+import Cart, { ICart } from "../models/cartModel";
 import Product from "../../admin/models/productModel";
 import {
   StatusCodes,
@@ -86,7 +86,7 @@ export const addToCart = async (
 };
 
 // Get user all cart items
-export const getAllCartIteams = async (req: CustomRequest) => {
+export const getAllCartItems = async (req: CustomRequest) => {
   try {
     const user = req.user as userType;
     if (!user) {
@@ -255,6 +255,62 @@ export const getUserCartItemById = async (
     };
   } catch (error) {
     console.error("Error in getting user cart items", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Remove product quantity from cart
+export const removeProductQuantity = async (
+  req: CustomRequest,
+  cartItemId: string
+) => {
+  try {
+    const user = req.user as userType;
+    if (!user) {
+      return {
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+
+    const userId = user.userId;
+    const cartItem = await Cart.findOne({
+      _id: cartItemId,
+      buyerUserId: userId,
+    });
+
+    if (!cartItem) {
+      return {
+        message: ErrorMessages.CartNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+
+    if (cartItem.quantity > 1) {
+      cartItem.quantity -= 1;
+      const updatedCartItem = await cartItem.save();
+      return {
+        message: SuccessMessages.CartItemUpdated,
+        success: true,
+        status: StatusCodes.Success.Ok,
+        data: updatedCartItem,
+      };
+    } else {
+      await cartItem.deleteOne();
+      return {
+        message: SuccessMessages.CartRemove,
+        success: true,
+        status: StatusCodes.Success.Ok,
+      };
+    }
+  } catch (error) {
+    console.error("Error in removing cart item", error);
     return {
       message: ErrorMessages.SomethingWentWrong,
       success: false,

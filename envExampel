@@ -24,5 +24,3 @@ Mail_Username =
 Mail_Password = 
 Mail_From = 
 
-# Redirection to client urls
-Reset_Password = 

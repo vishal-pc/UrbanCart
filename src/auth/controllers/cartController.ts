@@ -18,10 +18,10 @@ export const addToCart = async (req: Request, res: Response) => {
   }
 };
 
-// Get all iteams in the cart
-export const getAllCartIteams = async (req: Request, res: Response) => {
+// Get all item in the cart
+export const getAllCartItems = async (req: Request, res: Response) => {
   try {
-    const allProducts = await cartService.getAllCartIteams(req);
+    const allProducts = await cartService.getAllCartItems(req);
     return res.status(allProducts.status).json(allProducts);
   } catch (error) {
     console.error("Error in cart products", error);
@@ -33,7 +33,7 @@ export const getAllCartIteams = async (req: Request, res: Response) => {
   }
 };
 
-// Get user cart iteam by id
+// Get user cart item by id
 export const getUserCartItemById = async (req: Request, res: Response) => {
   try {
     const cartId = req.params.cartId;
@@ -41,6 +41,25 @@ export const getUserCartItemById = async (req: Request, res: Response) => {
     return res.status(allProducts.status).json(allProducts);
   } catch (error) {
     console.error("Error in cart products", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Remove product quantity from cart
+export const removeProductQuantity = async (req: Request, res: Response) => {
+  try {
+    const cartItemId = req.params.cartItemId;
+    const allProducts = await cartService.removeProductQuantity(
+      req,
+      cartItemId
+    );
+    return res.status(allProducts.status).json(allProducts);
+  } catch (error) {
+    console.error("Error in remove cart items", error);
     return {
       message: ErrorMessages.SomethingWentWrong,
       success: false,

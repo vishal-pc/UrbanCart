@@ -6,7 +6,6 @@ import { SuccessMessages, ErrorMessages } from "./validation/responseMessages";
 
 const Port = envConfig.Port;
 
-// Starting the server and listening on the specified port
 async function startServer() {
   try {
     app.listen(Port, () => {
