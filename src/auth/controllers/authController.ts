@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import * as authService from "../services/authServices";
 import { StatusCodes, ErrorMessages } from "../../validation/responseMessages";
 
+// User register
 export const authRegister = async (req: Request, res: Response) => {
   try {
     const result = await authService.authRegister(req.body);

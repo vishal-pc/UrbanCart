@@ -5,6 +5,8 @@ import bodyParser from "body-parser";
 import * as adminController from "../controller/adminContoller";
 import * as productController from "../controller/productController";
 import * as roleController from "../controller/roleController";
+import * as categoryController from "../controller/categoryController";
+import * as subCategoryController from "../controller/subCategoryController";
 
 const adminRouter = express.Router();
 
@@ -38,6 +40,35 @@ adminRouter.get(
   verifyAuthToken(["admin"]),
   adminController.getAllUsers
 );
+
+// Categories routes
+adminRouter.post(
+  "/create-category",
+  verifyAuthToken(["admin"]),
+  categoryController.createCategory
+);
+adminRouter.get(
+  "/get-all-categories",
+  verifyAuthToken(["admin"]),
+  categoryController.getAllCategories
+);
+adminRouter.get(
+  "/get-category/:categoryId",
+  verifyAuthToken(["admin"]),
+  categoryController.getCategoryById
+);
+
+// Sub categories routes
+adminRouter.post(
+  "/create-sub-category",
+  verifyAuthToken(["admin"]),
+  subCategoryController.createSubCategory
+);
+// adminRouter.get(
+//   "/get-all-sub-categories",
+//   verifyAuthToken(["admin"]),
+//   subCategoryController.getAllSubCategories
+// );
 
 // Product routes
 adminRouter.post(
