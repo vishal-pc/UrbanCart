@@ -8,10 +8,7 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
-import {
-  CustomRequest,
-  userType,
-} from "../../middleware/jwtToken/authMiddleware";
+import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
 
 // Register admin
 export const registerAdmin = async (adminData: any) => {

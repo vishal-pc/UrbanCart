@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyAuthToken } from "../../middleware/jwtToken/authMiddleware";
+import { verifyAuthToken } from "../../middleware/token/authMiddleware";
 import multer from "multer";
 import bodyParser from "body-parser";
 import * as adminController from "../controller/adminContoller";

@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyAuthToken } from "../../middleware/jwtToken/authMiddleware";
+import { verifyAuthToken } from "../../middleware/token/authMiddleware";
 import * as authController from "../controllers/authController";
 import * as cartController from "../controllers/cartController";
 import * as paymentController from "../controllers/paymentController";

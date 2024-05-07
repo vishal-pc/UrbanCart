@@ -5,10 +5,7 @@ import {
   ErrorMessages,
   SuccessMessages,
 } from "../../validation/responseMessages";
-import {
-  userType,
-  CustomRequest,
-} from "../../middleware/jwtToken/authMiddleware";
+import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
 import Cart from "../models/cartModel";
 
 // Process payment and save payment details

@@ -1,7 +1,4 @@
-import {
-  userType,
-  CustomRequest,
-} from "../../middleware/jwtToken/authMiddleware";
+import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
 import Cart, { ICart } from "../models/cartModel";
 import Product from "../../admin/models/productModel";
 import {

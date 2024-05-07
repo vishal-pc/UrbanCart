@@ -4,11 +4,8 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
-import cloudinary from "../../middleware/cloud/cloudnery";
-import {
-  CustomRequest,
-  userType,
-} from "../../middleware/jwtToken/authMiddleware";
+import cloudinary from "../../middleware/cloudflare/cloudinary";
+import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
 
 // Create a new product
 export const createProduct = async (
