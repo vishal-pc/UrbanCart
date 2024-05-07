@@ -15,7 +15,7 @@ export const StatusCodes = {
 
 export const SuccessMessages = {
   ServerRunning: "Server is running... 🚀",
-  DatabaseRunning: "Database connected... 👍",
+  DataBaseRunning: "Database connected... 👍",
   RoleCreated: "Role is created",
   SampleResponse: "Hello from Node.js",
   RegisterSuccess: "Registration successful",
