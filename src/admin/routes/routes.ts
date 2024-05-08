@@ -64,11 +64,16 @@ adminRouter.post(
   verifyAuthToken(["admin"]),
   subCategoryController.createSubCategory
 );
-// adminRouter.get(
-//   "/get-all-sub-categories",
-//   verifyAuthToken(["admin"]),
-//   subCategoryController.getAllSubCategories
-// );
+adminRouter.get(
+  "/get-all-sub-categories",
+  verifyAuthToken(["admin"]),
+  subCategoryController.getAllSubcategories
+);
+adminRouter.get(
+  "/get-sub-category/:subCategoryId",
+  verifyAuthToken(["admin"]),
+  subCategoryController.getSubcategoriesById
+);
 
 // Product routes
 adminRouter.post(

@@ -1,6 +1,4 @@
-import express, { Request } from "express";
-import fs from "fs";
-import path from "path";
+import { Request } from "express";
 import Auth from "../models/authModel";
 import bcrypt from "bcryptjs";
 import { envConfig } from "../../config/envConfig";
@@ -11,12 +9,7 @@ import {
   ErrorMessages,
 } from "../../validation/responseMessages";
 import { passwordRegex } from "../../helpers/helper";
-
-const router = express.Router();
-router.use(express.static("public"));
-
-const mailTemplatePath = path.join(__dirname, "../../public/mailTemplate.html");
-const mailTemplate = fs.readFileSync(mailTemplatePath, "utf-8");
+import { sendMailForPassword } from "../../template/mail";
 
 const otpStore: any = {};
 
@@ -40,15 +33,12 @@ export const forgetPassword = async (email: string) => {
     const otp = generateOTP();
     otpStore[email] = { otp, expiresAt: Date.now() + otpExpire };
 
-    const emailContent = mailTemplate
-      .replace("${fullName}", user.fullName)
-      .replace("${otp}", otp);
-
+    const emailContant = sendMailForPassword(user.fullName, otp);
     const mailOptions = {
       from: envConfig.Mail_From,
       to: user.email || "",
       subject: "Reset Password",
-      html: emailContent,
+      html: emailContant,
     };
 
     transporter.sendMail(mailOptions, (err) => {

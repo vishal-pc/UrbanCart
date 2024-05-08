@@ -1,9 +1,9 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface ICategories extends Document {
   categoryName: string;
   categoryDescription: string;
-  createdBy: string;
+  createdBy: Schema.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,7 +17,9 @@ const categorySchema = new mongoose.Schema(
       type: String,
     },
     createdBy: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Auth",
+      required: false,
     },
   },
   { timestamps: true }

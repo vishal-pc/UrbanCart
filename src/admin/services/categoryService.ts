@@ -5,6 +5,7 @@ import {
 } from "../../validation/responseMessages";
 import Category, { ICategories } from "../models/categoriesModel";
 import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
+import Auth from "../../auth/models/authModel";
 
 // Create a new category
 export const createCategory = async (categoryData: any, req: CustomRequest) => {
@@ -32,18 +33,30 @@ export const createCategory = async (categoryData: any, req: CustomRequest) => {
       };
     }
     const userId = user.userId;
+    const foundUser = await Auth.findById({ _id: userId });
 
     const newCategory: ICategories = new Category({
       categoryName,
       categoryDescription,
-      createdBy: userId,
+      createdBy: foundUser,
     });
     const savedCategory: ICategories = await newCategory.save();
     return {
       status: StatusCodes.Success.Created,
       message: SuccessMessages.CategoriesSuccess,
       success: true,
-      data: savedCategory,
+      data: {
+        _id: savedCategory._id,
+        categoryName: savedCategory.categoryName,
+        categoryDescription: savedCategory.categoryDescription,
+        createdBy: {
+          _id: foundUser?._id,
+          fullname: foundUser?.fullName,
+          IsAdmin: foundUser?.IsAdmin,
+        },
+        createdAt: savedCategory.createdAt,
+        updatedAt: savedCategory.updatedAt,
+      },
     };
   } catch (error) {
     return {

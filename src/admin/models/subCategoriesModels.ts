@@ -1,12 +1,10 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface ISubcategory extends Document {
-  subCategory: Array<{
-    _id: any;
-    subCategoryName: string;
-    subCategoryDescription: string;
-  }>;
-  createdBy: string;
+  _id: any;
+  subCategoryName: string;
+  subCategoryDescription: string;
+  createdBy: Schema.Types.ObjectId;
   categorieId: Schema.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -14,23 +12,21 @@ export interface ISubcategory extends Document {
 
 const subCategorySchema = new mongoose.Schema(
   {
-    subCategory: [
-      {
-        subCategoryName: {
-          type: String,
-        },
-        subCategoryDescription: {
-          type: String,
-        },
-      },
-    ],
+    subCategoryName: {
+      type: String,
+    },
+    subCategoryDescription: {
+      type: String,
+    },
     categorieId: {
       type: Schema.Types.ObjectId,
       ref: "Category",
       required: false,
     },
     createdBy: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Auth",
+      required: false,
     },
   },
 
