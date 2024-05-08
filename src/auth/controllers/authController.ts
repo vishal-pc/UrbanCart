@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
 import * as authService from "../services/authServices";
 import { StatusCodes, ErrorMessages } from "../../validation/responseMessages";
-import uuid from "uuidfgg";
 
 // User register
 export const authRegister = async (req: Request, res: Response) => {
   try {
-    console.log("testing");
     const result = await authService.authRegister(req.body);
     return res.status(result.status).json(result);
   } catch (error) {
