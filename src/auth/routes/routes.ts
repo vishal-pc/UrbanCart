@@ -36,6 +36,16 @@ authRouter.delete(
   verifyAuthToken(["user"]),
   cartController.removeProductQuantity
 );
+authRouter.patch(
+  "/update-cart-item/:cartId",
+  verifyAuthToken(["user"]),
+  cartController.updateCartItemQuantity
+);
+authRouter.delete(
+  "/delete-cart-item/:cartId",
+  verifyAuthToken(["user"]),
+  cartController.deleteCartItem
+);
 
 // Payment routes
 authRouter.post(

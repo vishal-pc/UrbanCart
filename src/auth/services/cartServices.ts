@@ -6,13 +6,10 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
+import Auth from "../models/authModel";
 
 // Add product to cart
-export const addToCart = async (
-  req: CustomRequest,
-  productId: string,
-  quantity: string
-) => {
+export const addToCart = async (req: CustomRequest, cartData: any) => {
   try {
     const user = req.user as userType;
     if (!user) {
@@ -23,38 +20,57 @@ export const addToCart = async (
       };
     }
     const userId = user.userId;
+    const foundUser = await Auth.findById({ _id: userId });
+
+    const { productId, productName } = cartData;
+
+    const product = await Product.findOne({
+      _id: productId,
+      productName: productName,
+    });
+    if (!product) {
+      return {
+        message: ErrorMessages.ProductNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+
     const existingCartItem = await Cart.findOne({
-      buyerUserId: userId,
-      productId,
+      buyerUserId: foundUser,
+      productId: product._id,
     });
     if (existingCartItem) {
-      if (
-        existingCartItem.quantity !== null &&
-        existingCartItem.quantity !== undefined
-      ) {
-        existingCartItem.quantity += parseInt(quantity);
-      }
+      // Increase the quantity of the existing cart item
+      existingCartItem.quantity += 1;
       const updatedCartItem = await existingCartItem.save();
       return {
-        message: SuccessMessages.CartSuccess,
+        message: SuccessMessages.CartAlreadySuccess,
         success: true,
         status: StatusCodes.Success.Ok,
-        data: updatedCartItem,
+        data: {
+          _id: updatedCartItem._id,
+          buyerUserId: {
+            fullName: foundUser?.fullName,
+            email: foundUser?.email,
+          },
+          productId: {
+            _id: product?._id,
+            productName: product?.productName,
+            productPrice: product?.productPrice,
+            productDescription: product?.productDescription,
+            productImg: product?.productImg,
+          },
+          quantity: updatedCartItem.quantity,
+          createdAt: updatedCartItem.createdAt,
+          updatedAt: updatedCartItem.updatedAt,
+        },
       };
     } else {
-      const product = await Product.findOne({ _id: productId });
-      if (!product) {
-        return {
-          message: ErrorMessages.ProductNotFound,
-          success: false,
-          status: StatusCodes.ClientError.NotFound,
-        };
-      }
-
       const newCartItem = new Cart({
-        buyerUserId: userId,
-        productId,
-        quantity,
+        buyerUserId: foundUser,
+        productId: product._id,
+        quantity: 1,
       });
       const savedCartItem = await newCartItem.save();
       if (savedCartItem) {
@@ -62,7 +78,23 @@ export const addToCart = async (
           message: SuccessMessages.CartSuccess,
           success: true,
           status: StatusCodes.Success.Created,
-          data: savedCartItem,
+          data: {
+            _id: savedCartItem._id,
+            buyerUserId: {
+              fullName: foundUser?.fullName,
+              email: foundUser?.email,
+            },
+            productId: {
+              _id: product?._id,
+              productName: product?.productName,
+              productPrice: product?.productPrice,
+              productDescription: product?.productDescription,
+              productImg: product?.productImg,
+            },
+            quantity: savedCartItem.quantity,
+            createdAt: savedCartItem.createdAt,
+            updatedAt: savedCartItem.updatedAt,
+          },
         };
       } else {
         return {
@@ -190,6 +222,7 @@ export const getUserCartItemById = async (
       };
     }
     const userId = user.userId;
+    const foundUser = await Auth.findById({ _id: userId });
 
     const cartItems = await Cart.find({ buyerUserId: userId, _id: cartId });
 
@@ -214,7 +247,11 @@ export const getUserCartItemById = async (
 
         const customizedCartItem = {
           _id: cartItem._id,
-          buyerUserId: cartItem.buyerUserId,
+          buyerUserId: {
+            _id: foundUser?._id,
+            fullName: foundUser?.fullName,
+            email: foundUser?.email,
+          },
           productDetails: {
             productId: cartItem.productId,
             productName: product.productName,
@@ -299,15 +336,107 @@ export const removeProductQuantity = async (
         data: updatedCartItem,
       };
     } else {
-      await cartItem.deleteOne();
       return {
-        message: SuccessMessages.CartRemove,
-        success: true,
-        status: StatusCodes.Success.Ok,
+        message: ErrorMessages.QuantityCannotBeZero,
+        success: false,
+        status: StatusCodes.ClientError.BadRequest,
       };
     }
   } catch (error) {
     console.error("Error in removing cart item", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Update cart item quantity
+export const updateCartItemQuantity = async (
+  req: CustomRequest,
+  cartItemData: any,
+  cartId: string
+) => {
+  try {
+    const user = req.user as userType;
+    if (!user) {
+      return {
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const userId = user.userId;
+    const foundUser = await Auth.findById({ _id: userId });
+
+    const { productId, productName, quantity } = cartItemData;
+    const foundProduct = await Product.findOne({
+      _id: productId,
+      productName: productName,
+    });
+    if (!foundProduct) {
+      return {
+        message: ErrorMessages.ProductNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const existingCartItem = await Cart.findOne({
+      buyerUserId: foundUser,
+      _id: cartId,
+      productId: foundProduct._id,
+    });
+    if (existingCartItem) {
+      existingCartItem.quantity += parseInt(quantity);
+      const updatedCartItem = await existingCartItem.save();
+      return {
+        message: SuccessMessages.CartItemUpdated,
+        success: true,
+        status: StatusCodes.Success.Ok,
+        data: updatedCartItem,
+      };
+    } else {
+      return {
+        message: ErrorMessages.CartUpdateError,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+  } catch (error) {
+    console.error("Error in updating cart item", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Delete cart item
+export const deleteCartItem = async (req: CustomRequest, cartId: string) => {
+  try {
+    const user = req.user as userType;
+    if (!user) {
+      return {
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const userId = user.userId;
+    const cartItem = await Cart.findOne({
+      _id: cartId,
+      buyerUserId: userId,
+    });
+    await cartItem?.deleteOne();
+    return {
+      message: SuccessMessages.CartRemove,
+      success: true,
+      status: StatusCodes.Success.Ok,
+    };
+  } catch (error) {
+    console.error("Error in deleting cart item", error);
     return {
       message: ErrorMessages.SomethingWentWrong,
       success: false,

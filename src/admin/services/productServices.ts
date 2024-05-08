@@ -6,6 +6,9 @@ import {
 } from "../../validation/responseMessages";
 import cloudinary from "../../middleware/cloudflare/cloudinary";
 import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
+import Auth from "../../auth/models/authModel";
+import Category, { ICategories } from "../models/categoriesModel";
+import SubCategory, { ISubcategory } from "../models/subCategoriesModels";
 
 // Create a new product
 export const createProduct = async (
@@ -22,10 +25,19 @@ export const createProduct = async (
     };
   }
   const userId = user.userId;
-  const { productName, productPrice, productDescription } = productData;
+  const foundUser = await Auth.findById({ _id: userId });
+  const {
+    categoryName,
+    subCategoryName,
+    productName,
+    productPrice,
+    productDescription,
+  } = productData;
   const tempPath = file?.path;
   try {
     const requiredFields = [
+      "categoryName",
+      "subCategoryName",
       "productName",
       "productPrice",
       "productDescription",
@@ -49,12 +61,35 @@ export const createProduct = async (
     }
     const uploadResult = await cloudinary.uploader.upload(tempPath);
     const secure_url = uploadResult.secure_url;
+
+    const foundCategory: ICategories | null = await Category.findOne({
+      categoryName: categoryName,
+    });
+    if (!foundCategory) {
+      return {
+        message: ErrorMessages.CategoriesNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const foundSubCategory: ISubcategory | null = await SubCategory.findOne({
+      subCategoryName: subCategoryName,
+    });
+    if (!foundSubCategory) {
+      return {
+        message: ErrorMessages.SubcategoriesNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
     const newProduct = {
+      categorieId: foundCategory._id,
+      subCategoryId: foundSubCategory._id,
       productName,
       productPrice,
       productDescription,
       productImg: secure_url,
-      createdBy: userId,
+      createdBy: foundUser,
     };
 
     const productSaved = await Product.create(newProduct);
@@ -63,7 +98,30 @@ export const createProduct = async (
         message: SuccessMessages.ProductSuccess,
         status: StatusCodes.Success.Created,
         success: true,
-        productSaved,
+        data: {
+          _id: productSaved._id,
+          productName: productSaved.productName,
+          productPrice: productSaved.productPrice,
+          productDescription: productSaved.productDescription,
+          productImg: productSaved.productImg,
+          categorieId: {
+            _id: foundCategory._id,
+            categoryName: foundCategory.categoryName,
+            categoryDescription: foundCategory.categoryDescription,
+          },
+          subCategoryId: {
+            _id: foundSubCategory._id,
+            subCategoryName: foundSubCategory.subCategoryName,
+            subCategoryDescription: foundSubCategory.subCategoryDescription,
+          },
+          createdBy: {
+            _id: foundUser?._id,
+            fullname: foundUser?.fullName,
+            IsAdmin: foundUser?.IsAdmin,
+          },
+          createdAt: productSaved.createdAt,
+          updatedAt: productSaved.updatedAt,
+        },
       };
     } else {
       return {

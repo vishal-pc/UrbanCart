@@ -30,6 +30,8 @@ export const SuccessMessages = {
   ProductDeletedSuccess: "Product deleted successfully",
   CartSuccess: "Item added in cart",
   CartFoundSuccess: "Item found in cart",
+  CartAlreadySuccess:
+    "Iteam already exists in cart and quentity increased by 1",
   CartItemUpdated: "Cart updated",
   CartRemove: "Item removed from cart",
   PaymentSuccess: "Payment successful",
@@ -76,7 +78,9 @@ export const ErrorMessages = {
   ProductUpdateError: "Error in updating product",
   ProductDeleteError: "Error in deleting product",
   CartError: "Error in creating cart",
+  CartUpdateError: "Error in updating cart",
   CartNotFound: "Cart not found",
+  QuantityCannotBeZero: "Quentity cannot be zero",
   PaymentError: "Error in creating payment details",
   PaymentNotFound: "Payment not found",
   ForgotPasswordError: "Faild to send otp",

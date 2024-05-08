@@ -1,7 +1,7 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface ICart extends Document {
-  buyerUserId: string;
+  buyerUserId: mongoose.Types.ObjectId;
   productId: mongoose.Types.ObjectId;
   quantity: number;
   createdAt: Date;
@@ -11,7 +11,9 @@ export interface ICart extends Document {
 const cartSchema = new mongoose.Schema(
   {
     buyerUserId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Auth",
+      required: false,
     },
     productId: {
       type: mongoose.Schema.Types.ObjectId,
