@@ -13,13 +13,13 @@ export const createSubCategory = async (
   subCategoryData: any,
   req: CustomRequest
 ) => {
-  const { subCategoryName, subCategoryDescription, categorieId } =
+  const { subCategoryName, subCategoryDescription, categoryName } =
     subCategoryData;
   try {
     const requiredFields = [
       "subCategoryName",
       "subCategoryDescription",
-      "categorieId",
+      "categoryName",
     ];
     const missingFields = requiredFields.filter(
       (field) => !subCategoryData[field]
@@ -44,12 +44,12 @@ export const createSubCategory = async (
     const userId = user.userId;
     const foundUser = await Auth.findById({ _id: userId });
 
-    const foundCategory: ICategories | null = await Category.findById(
-      categorieId
-    );
+    const foundCategory: ICategories | null = await Category.findOne({
+      categoryName: categoryName,
+    });
     if (!foundCategory) {
       return {
-        message: ErrorMessages.CategoriesError,
+        message: ErrorMessages.CategoriesNotFound,
         success: false,
         status: StatusCodes.ClientError.NotFound,
       };
@@ -58,7 +58,7 @@ export const createSubCategory = async (
     const newsubcategories: ISubcategory = new SubCategory({
       subCategoryName,
       subCategoryDescription,
-      categorieId: foundCategory,
+      categorieId: foundCategory._id,
       createdBy: foundUser,
     });
     const savedSubCategory: ISubcategory = await newsubcategories.save();

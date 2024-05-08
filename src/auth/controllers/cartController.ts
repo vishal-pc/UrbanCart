@@ -5,8 +5,7 @@ import { StatusCodes, ErrorMessages } from "../../validation/responseMessages";
 // Add products to cart
 export const addToCart = async (req: Request, res: Response) => {
   try {
-    const { productId, quantity } = req.body;
-    const result = await cartService.addToCart(req, productId, quantity);
+    const result = await cartService.addToCart(req, req.body);
     return res
       .status(result.status || StatusCodes.ServerError.InternalServerError)
       .json(result);
@@ -53,13 +52,47 @@ export const getUserCartItemById = async (req: Request, res: Response) => {
 export const removeProductQuantity = async (req: Request, res: Response) => {
   try {
     const cartItemId = req.params.cartItemId;
-    const allProducts = await cartService.removeProductQuantity(
-      req,
-      cartItemId
-    );
-    return res.status(allProducts.status).json(allProducts);
+    const result = await cartService.removeProductQuantity(req, cartItemId);
+    return res.status(result.status).json(result);
   } catch (error) {
     console.error("Error in remove cart items", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Update product quantity in cart
+export const updateCartItemQuantity = async (req: Request, res: Response) => {
+  try {
+    const cartId = req.params.cartId;
+    const cartItemData = req.body;
+    const result = await cartService.updateCartItemQuantity(
+      req,
+      cartItemData,
+      cartId
+    );
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.error("Error in updating cart items", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Delete cart item
+export const deleteCartItem = async (req: Request, res: Response) => {
+  try {
+    const cartId = req.params.cartId;
+    const result = await cartService.deleteCartItem(req, cartId);
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.error("Error in deleting cart items", error);
     return {
       message: ErrorMessages.SomethingWentWrong,
       success: false,
