@@ -58,7 +58,7 @@ export const createSubCategory = async (
     const newsubcategories: ISubcategory = new SubCategory({
       subCategoryName,
       subCategoryDescription,
-      categorieId: foundCategory._id,
+      categoryId: foundCategory._id,
       createdBy: foundUser,
     });
     const savedSubCategory: ISubcategory = await newsubcategories.save();
@@ -70,7 +70,7 @@ export const createSubCategory = async (
         _id: savedSubCategory._id,
         subCategoryName: savedSubCategory.subCategoryName,
         subCategoryDescription: savedSubCategory.subCategoryDescription,
-        categorieId: {
+        categoryId: {
           _id: foundCategory?._id,
           categoryName: foundCategory?.categoryName,
           categoryDescription: foundCategory?.categoryDescription,
@@ -118,7 +118,7 @@ export const getAllSubcategories = async (req: CustomRequest) => {
         _id: subcategory._id,
         subCategoryName: subcategory.subCategoryName,
         subCategoryDescription: subcategory.subCategoryDescription,
-        categorieId: subcategory.categorieId,
+        categoryId: subcategory.categoryId,
         createdBy: subcategory.createdBy,
         createdAt: subcategory.createdAt,
         updatedAt: subcategory.updatedAt,
@@ -165,7 +165,7 @@ export const getSubcategoriesById = async (
         _id: subcategory._id,
         subCategoryName: subcategory.subCategoryName,
         subCategoryDescription: subcategory.subCategoryDescription,
-        categorieId: subcategory.categorieId,
+        categoryId: subcategory.categoryId,
         createdBy: subcategory.createdBy,
         createdAt: subcategory.createdAt,
         updatedAt: subcategory.updatedAt,

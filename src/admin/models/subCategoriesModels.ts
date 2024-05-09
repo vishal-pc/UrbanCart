@@ -5,7 +5,7 @@ export interface ISubcategory extends Document {
   subCategoryName: string;
   subCategoryDescription: string;
   createdBy: Schema.Types.ObjectId;
-  categorieId: Schema.Types.ObjectId;
+  categoryId: Schema.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,7 +18,7 @@ const subCategorySchema = new mongoose.Schema(
     subCategoryDescription: {
       type: String,
     },
-    categorieId: {
+    categoryId: {
       type: Schema.Types.ObjectId,
       ref: "Category",
       required: false,

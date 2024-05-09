@@ -83,7 +83,7 @@ export const createProduct = async (
       };
     }
     const newProduct = {
-      categorieId: foundCategory._id,
+      categoryId: foundCategory._id,
       subCategoryId: foundSubCategory._id,
       productName,
       productPrice,
@@ -104,7 +104,7 @@ export const createProduct = async (
           productPrice: productSaved.productPrice,
           productDescription: productSaved.productDescription,
           productImg: productSaved.productImg,
-          categorieId: {
+          categoryId: {
             _id: foundCategory._id,
             categoryName: foundCategory.categoryName,
             categoryDescription: foundCategory.categoryDescription,
@@ -141,15 +141,45 @@ export const createProduct = async (
 };
 
 // Get all products
-export const getAllProducts = async (page: number, limit: number) => {
+export const getAllProducts = async (
+  page: number,
+  limit: number,
+  searchQuery?: string
+) => {
   try {
+    let filter: any = {};
+
+    if (searchQuery) {
+      const categoryIds = await Category.find({
+        $or: [
+          { categoryName: { $regex: searchQuery, $options: "i" } },
+          { categoryDescription: { $regex: searchQuery, $options: "i" } },
+        ],
+      }).distinct("_id");
+
+      const subCategoryIds = await SubCategory.find({
+        $or: [
+          { subCategoryName: { $regex: searchQuery, $options: "i" } },
+          { subCategoryDescription: { $regex: searchQuery, $options: "i" } },
+        ],
+      }).distinct("_id");
+
+      filter.$or = [
+        { productName: { $regex: searchQuery, $options: "i" } },
+        { productDescription: { $regex: searchQuery, $options: "i" } },
+        { categoryId: { $in: categoryIds } },
+        { subCategoryId: { $in: subCategoryIds } },
+      ];
+    }
+
     const skip = (page - 1) * limit;
-    const totalCount = await Product.countDocuments();
-    const allProducts = await Product.find().skip(skip).limit(limit);
+    const totalCount = await Product.countDocuments(filter);
+    const allProducts = await Product.find(filter).skip(skip).limit(limit);
+
     if (allProducts.length > 0) {
       return {
         message: SuccessMessages.ProductFoundSuccess,
-        status: StatusCodes.Success.Ok,
+        status: 200,
         success: true,
         data: {
           products: allProducts,
@@ -160,9 +190,9 @@ export const getAllProducts = async (page: number, limit: number) => {
       };
     } else {
       return {
-        message: ErrorMessages.ProductGetError,
+        message: ErrorMessages.ProductNotFound,
         success: false,
-        status: StatusCodes.ClientError.BadRequest,
+        status: 400,
       };
     }
   } catch (error) {
@@ -170,7 +200,7 @@ export const getAllProducts = async (page: number, limit: number) => {
     return {
       message: ErrorMessages.SomethingWentWrong,
       success: false,
-      status: StatusCodes.ServerError.InternalServerError,
+      status: 500,
     };
   }
 };
