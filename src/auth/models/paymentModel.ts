@@ -1,10 +1,10 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IPayment extends Document {
-  buyerUserId: string;
+  buyerUserId: Schema.Types.ObjectId;
   totalProduct: Array<{
     _id: any;
-    productId: string;
+    productId: Schema.Types.ObjectId;
     productName: string;
     productPrice: number;
     productQuentity: number;
@@ -20,12 +20,16 @@ export interface IPayment extends Document {
 const PaymentSchema = new mongoose.Schema(
   {
     buyerUserId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Auth",
+      required: false,
     },
     totalProduct: [
       {
         productId: {
-          type: String,
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+          required: false,
         },
         productName: {
           type: String,

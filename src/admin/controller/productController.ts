@@ -29,8 +29,13 @@ export const createProduct = async (req: Request, res: Response) => {
 export const getAllProducts = async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
+  const searchQuery = req.query.searchQuery as string;
   try {
-    const allProducts = await productServices.getAllProducts(page, limit);
+    const allProducts = await productServices.getAllProducts(
+      page,
+      limit,
+      searchQuery
+    );
     return res.status(allProducts.status).json(allProducts);
   } catch (error) {
     console.error("Error in getting all products", error);

@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IProduct extends Document {
   _id: any;
-  categorieId: Schema.Types.ObjectId;
+  categoryId: Schema.Types.ObjectId;
   subCategoryId: Schema.Types.ObjectId;
   productName: string;
   productPrice: number;
@@ -15,7 +15,7 @@ export interface IProduct extends Document {
 
 const productSchema = new mongoose.Schema(
   {
-    categorieId: {
+    categoryId: {
       type: Schema.Types.ObjectId,
       ref: "Category",
       required: false,
