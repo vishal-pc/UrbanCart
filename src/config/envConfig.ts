@@ -17,6 +17,9 @@ export interface EnvConfig {
   Mail_Password: string;
   Mail_From: string;
   Reset_Password: string;
+  Stripe_Secret_key: string;
+  Stripe_Public_Key: string;
+  Stripe_Web_Hook_Secret_Key: string;
 }
 
 export const envConfig: EnvConfig = {
@@ -35,4 +38,8 @@ export const envConfig: EnvConfig = {
   Mail_Password: process.env.Mail_Password || "defaultSecret",
   Mail_From: process.env.Mail_From || "defaultSecret",
   Reset_Password: process.env.Reset_Password || "defaultSecret",
+  Stripe_Secret_key: process.env.Stripe_Secret_key || "defaultSecret",
+  Stripe_Public_Key: process.env.Stripe_Public_Key || "defaultSecret",
+  Stripe_Web_Hook_Secret_Key:
+    process.env.Stripe_Web_Hook_Secret_Key || "defaultSecret",
 };

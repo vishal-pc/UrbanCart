@@ -9,9 +9,11 @@ const app = express();
 import authRoute from "./auth/routes/routes";
 import adminRouter from "./admin/routes/routes";
 import loginRouter from "./login/loginRoutes";
+import webhookRoute from "./auth/routes/webhookRoute";
+
+app.use("/stripe", webhookRoute);
 
 app.use(configCors());
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 

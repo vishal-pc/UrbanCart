@@ -32,6 +32,14 @@ export const createCategory = async (categoryData: any, req: CustomRequest) => {
         status: StatusCodes.ClientError.NotFound,
       };
     }
+    const existingCategory = await Category.findOne({ categoryName });
+    if (existingCategory) {
+      return {
+        message: ErrorMessages.CategoriesExists,
+        success: false,
+        status: StatusCodes.ClientError.Conflict,
+      };
+    }
     const userId = user.userId;
     const foundUser = await Auth.findById({ _id: userId });
 

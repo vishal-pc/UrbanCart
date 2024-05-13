@@ -1,18 +1,21 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IPayment extends Document {
+  _id: any;
   buyerUserId: Schema.Types.ObjectId;
   totalProduct: Array<{
     _id: any;
     productId: Schema.Types.ObjectId;
     productName: string;
     productPrice: number;
-    productQuentity: number;
+    productQuantity: number;
     productDescription: string;
     cartId: string;
   }>;
+  stripeUserId: string;
   totalCartAmount: number;
-  paymentStatus: "Pending" | "Completed";
+  paymentStatus: "Pending" | "Completed" | "Canceled";
+  stripePayment: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,7 +40,7 @@ const PaymentSchema = new mongoose.Schema(
         productPrice: {
           type: Number,
         },
-        productQuentity: {
+        productQuantity: {
           type: Number,
         },
         productDescription: {
@@ -51,10 +54,16 @@ const PaymentSchema = new mongoose.Schema(
     totalCartAmount: {
       type: Number,
     },
+    stripeUserId: {
+      type: String,
+    },
     paymentStatus: {
       type: String,
-      enum: ["Pending", "Completed"],
+      enum: ["Pending", "Completed", "Canceled"],
       default: "Pending",
+    },
+    stripePayment: {
+      type: Schema.Types.Mixed,
     },
   },
   { timestamps: true }

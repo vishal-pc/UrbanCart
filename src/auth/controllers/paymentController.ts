@@ -37,3 +37,18 @@ export const getPaymentById = async (req: Request, res: Response) => {
     };
   }
 };
+
+// Get all payment details
+export const getPaymentDetails = async (req: Request, res: Response) => {
+  try {
+    const result = await paymentService.getPaymentDetails(req);
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.error("Error in getting payment", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};

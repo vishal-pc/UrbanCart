@@ -58,6 +58,11 @@ authRouter.get(
   verifyAuthToken(["user"]),
   paymentController.getPaymentById
 );
+authRouter.get(
+  "/get-payment-details",
+  verifyAuthToken(["user"]),
+  paymentController.getPaymentDetails
+);
 
 // User routes
 authRouter.post("/forget-password", userController.forgetPassword);

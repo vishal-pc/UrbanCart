@@ -33,6 +33,14 @@ export const createSubCategory = async (
         status: StatusCodes.ClientError.BadRequest,
       };
     }
+    const existingSubCategory = await SubCategory.findOne({ subCategoryName });
+    if (existingSubCategory) {
+      return {
+        message: ErrorMessages.SubcategoriesExists,
+        success: false,
+        status: StatusCodes.ClientError.Conflict,
+      };
+    }
     const user = req.user as userType;
     if (!user) {
       return {
