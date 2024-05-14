@@ -8,12 +8,6 @@ import { ErrorMessages, StatusCodes } from "../../validation/responseMessages";
 import { envConfig } from "../../config/envConfig";
 import { downloadPdf } from "../../template/pdf";
 
-// const router = express.Router();
-// router.use(express.static("public"));
-
-// const mailTemplatePath = path.join(__dirname, "../../public/pdf.html");
-// const mailTemplate = fs.readFileSync(mailTemplatePath, "utf-8");
-
 const generateInvoiceNumber = () => {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   const length = 8;
@@ -50,14 +44,7 @@ export const downloadPdfInvoice = async (req: Request, res: Response) => {
       const time = dateTimeFormat[1];
       const dayTime = dateTimeFormat[2];
 
-      //   let emailContent = mailTemplate
-      //     .replace("{{fullName}}", buyerUserDetails.fullName)
-      //     .replace("{{date}}", date)
-      //     .replace("{{time}}", `${time} ${dayTime}`)
-      //     .replace("{{totalCartAmount}}", totalCartAmount);
-
       const invoiceNumber = generateInvoiceNumber();
-      //   emailContent = emailContent.replace("{{invoiceNumber}}", invoiceNumber);
 
       let productRowsHTML = "";
       for (const product of totalProduct) {
@@ -70,10 +57,6 @@ export const downloadPdfInvoice = async (req: Request, res: Response) => {
           </tr>
         `;
       }
-      //   emailContent = emailContent.replace(
-      //     "<!-- Product rows will be dynamically added here -->",
-      //     productRowsHTML
-      //   );
       let pdfdata = await downloadPdf(
         buyerUserDetails.fullName,
         totalCartAmount,
