@@ -10,6 +10,7 @@ export interface IPayment extends Document {
     productPrice: number;
     productQuantity: number;
     productDescription: string;
+    itemPrice: number;
     cartId: string;
   }>;
   stripeUserId: string;
@@ -45,6 +46,9 @@ const PaymentSchema = new mongoose.Schema(
         },
         productDescription: {
           type: String,
+        },
+        itemPrice: {
+          type: Number,
         },
         cartId: {
           type: String,

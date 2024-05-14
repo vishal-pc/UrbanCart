@@ -1,4 +1,4 @@
-import Payment, { IPayment } from "../models/paymentModel";
+import Payment from "../models/paymentModel";
 import Auth from "../models/authModel";
 import {
   StatusCodes,
@@ -23,6 +23,7 @@ export const processPayment = async (
     productPrice: number;
     productQuantity: number;
     productDescription: string;
+    itemPrice: number;
     cartId: string;
   }[],
   totalCartAmount: number
@@ -72,6 +73,7 @@ export const processPayment = async (
         productPrice: item.productPrice,
         productQuantity: item.productQuantity,
         productDescription: item.productDescription,
+        itemPrice: item.itemPrice,
         cartId: item.cartId,
       })),
       stripeUserId: customerId,
@@ -86,6 +88,7 @@ export const processPayment = async (
         productPrice: product.productPrice,
         productQuantity: product.productQuantity,
         productDescription: product.productDescription,
+        itemPrice: product.itemPrice,
         cartId: product.cartId,
       }))
     );
@@ -102,8 +105,8 @@ export const processPayment = async (
         quantity: item.productQuantity,
       })),
       mode: "payment",
-      success_url: "http://192.168.1.151:3000/dashboard/success",
-      cancel_url: "http://192.168.1.151:3000/dashboard/cancel",
+      success_url: envConfig.Success_Redirect,
+      cancel_url: envConfig.Cancel_Redirect,
       customer: customerId,
       client_reference_id: String(savedPayment._id),
       metadata: {
@@ -112,18 +115,6 @@ export const processPayment = async (
         totalCartAmount: String(savedPayment.totalCartAmount),
       },
     });
-
-    // const invoice = await stripe.invoices.create({
-    //   customer: customerId,
-    //   description: "Invoice for your recent purchase",
-    //   metadata: {
-    //     userId: String(user.userId),
-    //     currency: "inr",
-    //     products: productMetadata,
-    //     totalCartAmount: String(savedPayment.totalCartAmount),
-    //   },
-    // });
-    // const invoiceLink = invoice.invoice_pdf;
 
     const updatedPayment = await Payment.findOneAndUpdate(
       { _id: savedPayment._id },
@@ -138,7 +129,6 @@ export const processPayment = async (
         status: StatusCodes.Success.Created,
         payment: updatedPayment,
         sessionId: session.id,
-        // invoiceLink,
       };
     } else {
       return {

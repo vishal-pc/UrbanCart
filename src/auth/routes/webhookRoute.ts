@@ -35,12 +35,18 @@ webhookRoute.post(
         case "charge.succeeded":
           session = event.data.object;
           break;
+        case "charge.failed":
+          session = event.data.object;
+          break;
         case "checkout.session.completed":
           session = event.data.object;
           let paymentData = event.data.object;
           if (paymentData.payment_status === "paid") {
             await updatePaymentIntent(paymentData);
           }
+          break;
+        case "checkout.session.expired":
+          session = event.data.object;
           break;
         case "payment_intent.succeeded":
           session = event.data.object;

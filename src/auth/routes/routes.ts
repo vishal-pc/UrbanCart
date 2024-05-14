@@ -4,6 +4,7 @@ import * as authController from "../controllers/authController";
 import * as cartController from "../controllers/cartController";
 import * as paymentController from "../controllers/paymentController";
 import * as userController from "../controllers/userController";
+import * as pdfService from "../services/pdfDownload";
 
 const authRouter = express.Router();
 
@@ -67,5 +68,12 @@ authRouter.get(
 // User routes
 authRouter.post("/forget-password", userController.forgetPassword);
 authRouter.post("/reset-password", userController.resetPassword);
+
+// Invoice route
+authRouter.get(
+  "/download-pdf/:paymentId",
+  verifyAuthToken(["user"]),
+  pdfService.downloadPdfInvoice
+);
 
 export default authRouter;

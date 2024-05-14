@@ -20,6 +20,9 @@ export interface EnvConfig {
   Stripe_Secret_key: string;
   Stripe_Public_Key: string;
   Stripe_Web_Hook_Secret_Key: string;
+  Success_Redirect: string;
+  Cancel_Redirect: string;
+  Get_Payment_By_ID: string;
 }
 
 export const envConfig: EnvConfig = {
@@ -42,4 +45,7 @@ export const envConfig: EnvConfig = {
   Stripe_Public_Key: process.env.Stripe_Public_Key || "defaultSecret",
   Stripe_Web_Hook_Secret_Key:
     process.env.Stripe_Web_Hook_Secret_Key || "defaultSecret",
+  Success_Redirect: process.env.Success_Redirect || "defaultSecret",
+  Cancel_Redirect: process.env.Cancel_Redirect || "defaultSecret",
+  Get_Payment_By_ID: process.env.Get_Payment_By_ID || "defaultSecret",
 };
