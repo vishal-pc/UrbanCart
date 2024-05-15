@@ -8,6 +8,7 @@ export const processPayment = async (req: Request, res: Response) => {
   try {
     const result = await paymentService.processPayment(
       req,
+      res,
       totalProduct,
       totalCartAmount
     );

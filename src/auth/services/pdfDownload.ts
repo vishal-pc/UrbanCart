@@ -1,28 +1,48 @@
-import express, { Request, Response } from "express";
+import { Response } from "express";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
 import puppeteer from "puppeteer";
 import moment from "moment-timezone";
-import { ErrorMessages, StatusCodes } from "../../validation/responseMessages";
+import {
+  ErrorMessages,
+  StatusCodes,
+  SuccessMessages,
+} from "../../validation/responseMessages";
 import { envConfig } from "../../config/envConfig";
-import { downloadPdf } from "../../template/pdf";
+import { downloadPdf } from "../../template/invoicePdf";
+import Invoice from "../models/invoiceModel";
+import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
+import cloudinary from "../../middleware/cloudflare/cloudinary";
+import { generateRandomNumber } from "../../helpers/randomNumber";
 
-const generateInvoiceNumber = () => {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  const length = 8;
-  let invoiceNumber = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    invoiceNumber += characters.charAt(randomIndex);
-  }
+// Find for existing random numbers
+const generateUniqueOrderNumber = async () => {
+  let invoiceNumber;
+  let existingPayment;
+
+  do {
+    invoiceNumber = generateRandomNumber();
+    existingPayment = await Invoice.findOne({ invoiceNumber });
+  } while (existingPayment);
+
   return invoiceNumber;
 };
 
-export const downloadPdfInvoice = async (req: Request, res: Response) => {
+// Download invoice in pdf
+export const downloadPdfInvoice = async (req: CustomRequest, res: Response) => {
   try {
+    const user = req.user as userType;
+    if (!user) {
+      return res.status(StatusCodes.ClientError.NotFound).json({
+        message: ErrorMessages.UserNotFound,
+        success: false,
+      });
+    }
+    const userId = user.userId;
     const paymentId = req.params.paymentId;
     const token = req.headers.authorization;
+
     const axiosConfig = {
       headers: {
         Authorization: token,
@@ -35,16 +55,21 @@ export const downloadPdfInvoice = async (req: Request, res: Response) => {
     const paymentData = fetchPaymentDetails.data.payment;
 
     if (paymentData) {
-      const { buyerUserDetails, totalCartAmount, totalProduct } = paymentData;
-      const formattedDateAndTime = moment(paymentData.createdAt).format(
-        "DD-MM-YYYY h:mm A"
-      );
+      const {
+        buyerUserDetails,
+        totalCartAmount,
+        totalProduct,
+        orderNumber,
+        createdAt,
+      } = paymentData;
+      const formattedDateAndTime =
+        moment(createdAt).format("DD-MM-YYYY h:mm A");
       const dateTimeFormat = formattedDateAndTime.split(" ");
       const date = dateTimeFormat[0];
       const time = dateTimeFormat[1];
       const dayTime = dateTimeFormat[2];
 
-      const invoiceNumber = generateInvoiceNumber();
+      const invoiceNumber = await generateUniqueOrderNumber();
 
       let productRowsHTML = "";
       for (const product of totalProduct) {
@@ -63,11 +88,13 @@ export const downloadPdfInvoice = async (req: Request, res: Response) => {
         invoiceNumber,
         date,
         time,
-        productRowsHTML
+        dayTime,
+        productRowsHTML,
+        orderNumber
       );
+
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
-
       await page.setContent(pdfdata);
 
       const pdfOptions: any = {
@@ -87,9 +114,36 @@ export const downloadPdfInvoice = async (req: Request, res: Response) => {
         `../../uploads/pdf/${invoiceNumber}.pdf`
       );
       await fs.promises.writeFile(pdfPath, pdfBuffer);
-
       await browser.close();
-      res.sendFile(pdfPath);
+
+      const uploadResult = await cloudinary.uploader.upload(pdfPath);
+      const secure_url = uploadResult.secure_url;
+
+      const newInvoice = new Invoice({
+        buyerUserId: userId,
+        paymentId: paymentId,
+        productId: totalProduct.map((product: any) => product._id),
+        pdfUrl: secure_url,
+        invoiceNumber: invoiceNumber,
+        orderNumber: orderNumber,
+        totalCartAmount: totalCartAmount,
+      });
+
+      await newInvoice.save();
+
+      res.status(StatusCodes.Success.Created).json({
+        message: SuccessMessages.PdfInfo,
+        success: true,
+        pdfUrl: uploadResult.secure_url,
+      });
+
+      await fs.promises.unlink(pdfPath);
+    } else {
+      return {
+        message: ErrorMessages.SomethingWentWrong,
+        success: false,
+        status: StatusCodes.ServerError.InternalServerError,
+      };
     }
   } catch (error) {
     console.error("Error generating PDF:", error);

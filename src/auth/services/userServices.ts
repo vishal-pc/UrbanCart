@@ -9,7 +9,7 @@ import {
   ErrorMessages,
 } from "../../validation/responseMessages";
 import { passwordRegex } from "../../helpers/helper";
-import { sendMailForPassword } from "../../template/mail";
+import { sendMailForPassword } from "../../template/forgetPassMail";
 
 const otpStore: any = {};
 
@@ -20,7 +20,7 @@ export const forgetPassword = async (email: string) => {
       const otp = Math.floor(1000 + Math.random() * 9000);
       return otp.toString();
     };
-    const otpExpire = 2 * 60 * 1000;
+    const otpExpire = 5 * 60 * 1000;
 
     const user = await Auth.findOne({ email: email });
     if (!user) {

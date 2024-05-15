@@ -1,3 +1,4 @@
+import { Response } from "express";
 import Payment from "../models/paymentModel";
 import Auth from "../models/authModel";
 import {
@@ -9,6 +10,14 @@ import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
 import { envConfig } from "../../config/envConfig";
 import Cart from "../models/cartModel";
 import Stripe from "stripe";
+import moment from "moment-timezone";
+import Product from "../../admin/models/productModel";
+import { generateRandomNumber } from "../../helpers/randomNumber";
+import { transporter } from "../../middleware/mail/transPorter";
+import {
+  orderConfirmTemplateToUser,
+  orderConfirmTemplateToAdmin,
+} from "../../template/orderConfirm";
 
 const stripe = new Stripe(envConfig.Stripe_Secret_key, {
   apiVersion: "2024-04-10",
@@ -17,6 +26,7 @@ const stripe = new Stripe(envConfig.Stripe_Secret_key, {
 // Process payment and save payment details
 export const processPayment = async (
   req: CustomRequest,
+  res: Response,
   totalProduct: {
     productId: string;
     productName: string;
@@ -65,74 +75,172 @@ export const processPayment = async (
       await findUser?.save();
     }
 
-    const newPayment = new Payment({
-      buyerUserId: userId,
-      totalProduct: totalProduct.map((item) => ({
-        to: item.productId,
-        productName: item.productName,
-        productPrice: item.productPrice,
-        productQuantity: item.productQuantity,
-        productDescription: item.productDescription,
-        itemPrice: item.itemPrice,
-        cartId: item.cartId,
-      })),
-      stripeUserId: customerId,
-      totalCartAmount,
-    });
-
-    const savedPayment = await newPayment.save();
-
-    const productMetadata = JSON.stringify(
-      totalProduct.map((product) => ({
-        productName: product.productName,
-        productPrice: product.productPrice,
-        productQuantity: product.productQuantity,
-        productDescription: product.productDescription,
-        itemPrice: product.itemPrice,
-        cartId: product.cartId,
-      }))
+    const detailedProducts = await Promise.all(
+      totalProduct.map(async (item) => {
+        const productDetails = await Product.findById(item.productId);
+        return {
+          ...item,
+          productImageUrl: productDetails?.productImg || "",
+        };
+      })
     );
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: totalProduct.map((item: any) => ({
-        price_data: {
-          currency: "inr",
-          product_data: {
-            name: item.productName,
+
+    const orderNumber = generateRandomNumber();
+    const existingPaymentOrderNumber = await Payment.findOne({
+      orderNumber: orderNumber,
+    });
+    const newOrderNumber = existingPaymentOrderNumber;
+    if (!newOrderNumber) {
+      const newPayment = new Payment({
+        buyerUserId: userId,
+        totalProduct: detailedProducts.map((item) => ({
+          to: item.productId,
+          productName: item.productName,
+          productPrice: item.productPrice,
+          productQuantity: item.productQuantity,
+          productDescription: item.productDescription,
+          itemPrice: item.itemPrice,
+          cartId: item.cartId,
+          productImageUrl: item.productImageUrl,
+        })),
+        stripeUserId: customerId,
+        orderNumber: orderNumber,
+        totalCartAmount,
+      });
+
+      const savedPayment = await newPayment.save();
+
+      const productMetadata = JSON.stringify(
+        totalProduct.map((product) => ({
+          productName: product.productName,
+          productPrice: product.productPrice,
+          productQuantity: product.productQuantity,
+          productDescription: product.productDescription,
+          itemPrice: product.itemPrice,
+          cartId: product.cartId,
+        }))
+      );
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: totalProduct.map((item: any) => ({
+          price_data: {
+            currency: "inr",
+            product_data: {
+              name: item.productName,
+            },
+            unit_amount: item.productPrice * 100,
           },
-          unit_amount: item.productPrice * 100,
+          quantity: item.productQuantity,
+        })),
+        mode: "payment",
+        success_url: envConfig.Success_Redirect,
+        cancel_url: envConfig.Cancel_Redirect,
+        customer: customerId,
+        client_reference_id: String(savedPayment._id),
+        metadata: {
+          userId: String(user.userId),
+          products: productMetadata,
+          totalCartAmount: String(savedPayment.totalCartAmount),
         },
-        quantity: item.productQuantity,
-      })),
-      mode: "payment",
-      success_url: envConfig.Success_Redirect,
-      cancel_url: envConfig.Cancel_Redirect,
-      customer: customerId,
-      client_reference_id: String(savedPayment._id),
-      metadata: {
-        userId: String(user.userId),
-        products: productMetadata,
-        totalCartAmount: String(savedPayment.totalCartAmount),
-      },
-    });
+      });
 
-    const updatedPayment = await Payment.findOneAndUpdate(
-      { _id: savedPayment._id },
-      {
-        stripePayment: session,
+      const updatedPayment = await Payment.findOneAndUpdate(
+        { _id: savedPayment._id },
+        {
+          stripePayment: session,
+        }
+      );
+      if (updatedPayment) {
+        const formattedDateAndTime = moment(newPayment.createdAt).format(
+          "DD-MM-YYYY h:mm A"
+        );
+        const dateTimeFormat = formattedDateAndTime.split(" ");
+        const date = dateTimeFormat[0];
+        const time = dateTimeFormat[1];
+        const dayTime = dateTimeFormat[2];
+
+        let confirmOrderHTML = "";
+        for (const product of totalProduct) {
+          confirmOrderHTML += `
+          <tr>
+          <td width="35%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+            ${product.productName}
+          </td>
+          <td width="23%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+            ${product.productQuantity}
+          </td>
+          <td width="24%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+            ₹ ${product.productPrice}
+          </td>
+          <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+            ₹ ${product.itemPrice}
+          </td>
+        </tr>
+          `;
+        }
+
+        let orderDataToUser = await orderConfirmTemplateToUser(
+          findUser?.fullName || "",
+          totalCartAmount,
+          date,
+          time,
+          dayTime,
+          confirmOrderHTML,
+          orderNumber
+        );
+
+        const userMailOptions = {
+          from: envConfig.Mail_From,
+          to: findUser?.email || "",
+          subject: "Order Placed Confirmation",
+          html: orderDataToUser,
+        };
+
+        transporter.sendMail(userMailOptions, (err) => {
+          if (err) {
+            console.error("Error sending email to user:", err);
+          }
+        });
+
+        let orderDataToAdmin = await orderConfirmTemplateToAdmin(
+          findUser?.fullName || "",
+          totalCartAmount,
+          date,
+          time,
+          dayTime,
+          confirmOrderHTML,
+          orderNumber
+        );
+
+        // Send notification email to the admin
+        const adminMailOptions = {
+          from: envConfig.Mail_From,
+          to: "vishal.kumar@technocratshorizons.com",
+          subject: "Order Placed Confirmation",
+          html: orderDataToAdmin,
+        };
+        transporter.sendMail(adminMailOptions, (err) => {
+          if (err) {
+            console.error("Error sending email to admin:", err);
+          }
+        });
+        return {
+          message: SuccessMessages.PaymentSuccess,
+          success: true,
+          status: StatusCodes.Success.Created,
+          payment: updatedPayment,
+          sessionId: session.id,
+        };
+      } else {
+        return {
+          message: ErrorMessages.PaymentError,
+          success: false,
+          status: StatusCodes.ClientError.BadRequest,
+        };
       }
-    );
-    if (updatedPayment) {
-      return {
-        message: SuccessMessages.PaymentSuccess,
-        success: true,
-        status: StatusCodes.Success.Created,
-        payment: updatedPayment,
-        sessionId: session.id,
-      };
     } else {
       return {
-        message: ErrorMessages.PaymentError,
+        message: ErrorMessages.SomethingWentWrong,
         success: false,
         status: StatusCodes.ClientError.BadRequest,
       };
@@ -177,7 +285,7 @@ export const getPaymentById = async (paymentId: string) => {
       totalProduct: payment.totalProduct,
       totalCartAmount: payment.totalCartAmount,
       paymentStatus: payment.paymentStatus,
-      // stripePayment: payment.stripePayment,
+      orderNumber: payment.orderNumber,
       createdAt: payment.createdAt,
       updatedAt: payment.updatedAt,
       __v: payment.__v,

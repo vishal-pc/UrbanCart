@@ -42,6 +42,7 @@ export const SuccessMessages = {
     "Reset password OTP has been sent to your email address",
   ResetPasswordsSuccess: "Password reset successfully",
   DataFound: "Data found",
+  PdfInfo: "pdf info saved",
 };
 
 export const ErrorMessages = {

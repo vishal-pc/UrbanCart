@@ -34,7 +34,7 @@ export const sendMailForPassword = (fullName: string, otp: string) => {
             <span style="color: #007bff">${otp} </span>
           </p>
           <p style="font-size: small">
-            <strong>Note:-</strong>The OTP will expire within 2 minutes!
+            <strong>Note:-</strong>The OTP will expire within 5 minutes!
           </p>
           <p style="font-size: 16px">Best regards,<br />Your Company Name</p>
         </div>
