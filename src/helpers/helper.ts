@@ -14,3 +14,15 @@ export const emailValidate = (email: string) => {
     return false;
   }
 };
+
+// mobile number validation
+export const validateMobileNumber = (mobileNumber: string): boolean => {
+  const indianMobileRegex = /^[789]\d{9}$/;
+  return indianMobileRegex.test(mobileNumber);
+};
+
+// pincode validation
+export const validatePinCode = (pinCode: string): boolean => {
+  const indianPinCodeRegex = /^\d{6}$/;
+  return indianPinCodeRegex.test(pinCode);
+};

@@ -8,6 +8,7 @@ import {
   ErrorMessages,
   StatusCodes,
 } from "../../validation/responseMessages";
+import { validateMobileNumber, validatePinCode } from "../../helpers/helper";
 
 // Saved User address
 export const saveUserAddress = async (addressData: any, req: CustomRequest) => {
@@ -49,6 +50,20 @@ export const saveUserAddress = async (addressData: any, req: CustomRequest) => {
         message: ErrorMessages.MissingFields(missingFieldsMessage),
         success: false,
         status: StatusCodes.ClientError.BadRequest,
+      };
+    }
+    if (!validateMobileNumber(mobileNumber)) {
+      return {
+        message: ErrorMessages.InvalidMobileNumber,
+        status: StatusCodes.ClientError.BadRequest,
+        success: false,
+      };
+    }
+    if (!validatePinCode(areaPincode)) {
+      return {
+        message: ErrorMessages.InvalidPinCodeNumber,
+        status: StatusCodes.ClientError.BadRequest,
+        success: false,
       };
     }
     const newAddress = {
