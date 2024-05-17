@@ -4,13 +4,13 @@ import { StatusCodes, ErrorMessages } from "../../validation/responseMessages";
 
 // Create a new payment
 export const processPayment = async (req: Request, res: Response) => {
-  const { totalProduct, totalCartAmount } = req.body;
+  const { totalProduct, totalCartAmount, addressId } = req.body;
   try {
     const result = await paymentService.processPayment(
       req,
-      res,
       totalProduct,
-      totalCartAmount
+      totalCartAmount,
+      addressId
     );
     return res.status(result.status).json(result);
   } catch (error) {

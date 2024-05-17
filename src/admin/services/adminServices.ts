@@ -83,54 +83,6 @@ export const registerAdmin = async (adminData: any) => {
   }
 };
 
-// Get admin user By id
-export const getAdminById = async (req: CustomRequest) => {
-  try {
-    const user = req.user as userType;
-    if (!user) {
-      return {
-        message: ErrorMessages.UserNotFound,
-        success: false,
-        status: StatusCodes.ClientError.NotFound,
-      };
-    }
-    const userId = user.userId;
-    const foundedUser = await Auth.findById({ _id: userId }).populate(
-      "role",
-      "role"
-    );
-    if (!foundedUser) {
-      return {
-        message: ErrorMessages.UserNotFound,
-        success: false,
-        status: StatusCodes.ClientError.NotFound,
-      };
-    }
-    const userData = {
-      _id: foundedUser.id,
-      fullName: foundedUser.fullName,
-      email: foundedUser.email,
-      IsAdmin: foundedUser.IsAdmin,
-      role: foundedUser.role,
-      createdAt: foundedUser.createdAt,
-      updatedAt: foundedUser.updatedAt,
-    };
-    return {
-      message: SuccessMessages.UserFound,
-      status: StatusCodes.Success.Ok,
-      success: true,
-      userData,
-    };
-  } catch (error) {
-    console.error("Error in getting user by id", error);
-    return {
-      message: ErrorMessages.SomethingWentWrong,
-      success: false,
-      status: StatusCodes.ServerError.InternalServerError,
-    };
-  }
-};
-
 // Get all users
 export const getAllUsers = async () => {
   try {

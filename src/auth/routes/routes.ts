@@ -5,6 +5,7 @@ import * as cartController from "../controllers/cartController";
 import * as paymentController from "../controllers/paymentController";
 import * as userController from "../controllers/userController";
 import * as pdfService from "../services/pdfDownload";
+import * as addressController from "../controllers/addressController";
 
 const authRouter = express.Router();
 
@@ -12,7 +13,7 @@ const authRouter = express.Router();
 authRouter.post("/register", authController.authRegister);
 authRouter.get(
   "/get-user",
-  verifyAuthToken(["user"]),
+  verifyAuthToken(["user", "admin"]),
   authController.getUserById
 );
 
@@ -48,6 +49,23 @@ authRouter.delete(
   cartController.deleteCartItem
 );
 
+// Address routes
+authRouter.post(
+  "/add-address",
+  verifyAuthToken(["user"]),
+  addressController.saveUserAddress
+);
+authRouter.get(
+  "/get-address",
+  verifyAuthToken(["user"]),
+  addressController.getAllUsersAddress
+);
+authRouter.get(
+  "/get-address/:addressId",
+  verifyAuthToken(["user"]),
+  addressController.getUserAddressById
+);
+
 // Payment routes
 authRouter.post(
   "/process-payment",
@@ -68,6 +86,26 @@ authRouter.get(
 // User routes
 authRouter.post("/forget-password", userController.forgetPassword);
 authRouter.post("/reset-password", userController.resetPassword);
+authRouter.patch(
+  "/change-password",
+  verifyAuthToken(["user", "admin"]),
+  userController.changePassword
+);
+authRouter.get(
+  "/get-categories",
+  verifyAuthToken(["user"]),
+  userController.getCategories
+);
+authRouter.get(
+  "/get-categories/:categoryId",
+  verifyAuthToken(["user"]),
+  userController.getCategoriesByIdWithSubCategories
+);
+authRouter.get(
+  "/get-sub-categories/:subcategoryId",
+  verifyAuthToken(["user"]),
+  userController.getSubCategoriesByIdWithProducts
+);
 
 // Invoice route
 authRouter.get(

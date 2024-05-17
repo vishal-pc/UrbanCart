@@ -31,11 +31,6 @@ adminRouter.post("/create-role", roleController.createRole);
 // Admin routes
 adminRouter.post("/register", adminController.adminRegister);
 adminRouter.get(
-  "/get-admin",
-  verifyAuthToken(["admin"]),
-  adminController.getAdminById
-);
-adminRouter.get(
   "/get-all-users",
   verifyAuthToken(["admin"]),
   adminController.getAllUsers

@@ -19,6 +19,7 @@ export interface IPayment extends Document {
   paymentStatus: "Pending" | "Completed" | "Canceled";
   orderNumber: string;
   stripePayment: string;
+  addressId: Schema.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -76,6 +77,11 @@ const PaymentSchema = new mongoose.Schema(
     },
     stripePayment: {
       type: Schema.Types.Mixed,
+    },
+    addressId: {
+      type: Schema.Types.ObjectId,
+      ref: "Address",
+      required: false,
     },
   },
   { timestamps: true }

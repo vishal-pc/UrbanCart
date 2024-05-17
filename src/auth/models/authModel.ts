@@ -6,12 +6,6 @@ export interface IAuth extends Document {
   password: string;
   IsAdmin: boolean;
   role: Schema.Types.ObjectId;
-  mobileNumber: number;
-  state: string;
-  streetAddress: string;
-  nearByAddress: string;
-  areaPincode: number;
-  city: string;
   stripeUserId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -33,12 +27,6 @@ const authSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    mobileNumber: { type: Number },
-    state: { type: String },
-    streetAddress: { type: String },
-    nearByAddress: { type: String },
-    areaPincode: { type: Number },
-    city: { type: String },
     stripeUserId: { type: String },
   },
   { timestamps: true }

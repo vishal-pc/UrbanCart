@@ -1,4 +1,3 @@
-import { Response } from "express";
 import Payment from "../models/paymentModel";
 import Auth from "../models/authModel";
 import {
@@ -18,6 +17,7 @@ import {
   orderConfirmTemplateToUser,
   orderConfirmTemplateToAdmin,
 } from "../../template/orderConfirm";
+import Address from "../models/addressModel";
 
 const stripe = new Stripe(envConfig.Stripe_Secret_key, {
   apiVersion: "2024-04-10",
@@ -26,7 +26,6 @@ const stripe = new Stripe(envConfig.Stripe_Secret_key, {
 // Process payment and save payment details
 export const processPayment = async (
   req: CustomRequest,
-  res: Response,
   totalProduct: {
     productId: string;
     productName: string;
@@ -36,7 +35,8 @@ export const processPayment = async (
     itemPrice: number;
     cartId: string;
   }[],
-  totalCartAmount: number
+  totalCartAmount: number,
+  addressId: string
 ) => {
   try {
     const user = req.user as userType;
@@ -105,6 +105,7 @@ export const processPayment = async (
         })),
         stripeUserId: customerId,
         orderNumber: orderNumber,
+        addressId: addressId,
         totalCartAmount,
       });
 
@@ -151,79 +152,6 @@ export const processPayment = async (
         }
       );
       if (updatedPayment) {
-        const formattedDateAndTime = moment(newPayment.createdAt).format(
-          "DD-MM-YYYY h:mm A"
-        );
-        const dateTimeFormat = formattedDateAndTime.split(" ");
-        const date = dateTimeFormat[0];
-        const time = dateTimeFormat[1];
-        const dayTime = dateTimeFormat[2];
-
-        let confirmOrderHTML = "";
-        for (const product of totalProduct) {
-          confirmOrderHTML += `
-          <tr>
-          <td width="35%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
-            ${product.productName}
-          </td>
-          <td width="23%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
-            ${product.productQuantity}
-          </td>
-          <td width="24%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
-            ₹ ${product.productPrice}
-          </td>
-          <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
-            ₹ ${product.itemPrice}
-          </td>
-        </tr>
-          `;
-        }
-
-        let orderDataToUser = await orderConfirmTemplateToUser(
-          findUser?.fullName || "",
-          totalCartAmount,
-          date,
-          time,
-          dayTime,
-          confirmOrderHTML,
-          orderNumber
-        );
-
-        const userMailOptions = {
-          from: envConfig.Mail_From,
-          to: findUser?.email || "",
-          subject: "Order Placed Confirmation",
-          html: orderDataToUser,
-        };
-
-        transporter.sendMail(userMailOptions, (err) => {
-          if (err) {
-            console.error("Error sending email to user:", err);
-          }
-        });
-
-        let orderDataToAdmin = await orderConfirmTemplateToAdmin(
-          findUser?.fullName || "",
-          totalCartAmount,
-          date,
-          time,
-          dayTime,
-          confirmOrderHTML,
-          orderNumber
-        );
-
-        // Send notification email to the admin
-        const adminMailOptions = {
-          from: envConfig.Mail_From,
-          to: "vishal.kumar@technocratshorizons.com",
-          subject: "Order Placed Confirmation",
-          html: orderDataToAdmin,
-        };
-        transporter.sendMail(adminMailOptions, (err) => {
-          if (err) {
-            console.error("Error sending email to admin:", err);
-          }
-        });
         return {
           message: SuccessMessages.PaymentSuccess,
           success: true,
@@ -275,12 +203,30 @@ export const getPaymentById = async (paymentId: string) => {
         status: StatusCodes.ServerError.InternalServerError,
       };
     }
+    const addressDetails = await Address.findById({ _id: payment.addressId });
+    if (!addressDetails) {
+      return {
+        message: ErrorMessages.AddressNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
     const formattedPayment = {
       _id: payment._id,
       buyerUserDetails: {
         buyerUserId: payment.buyerUserId,
         fullName: buyerUserDetails.fullName,
         email: buyerUserDetails.email,
+      },
+      addressDetails: {
+        addressId: addressDetails?._id,
+        streetAddress: addressDetails.streetAddress,
+        nearByAddress: addressDetails.nearByAddress,
+        city: addressDetails.city,
+        state: addressDetails.state,
+        country: addressDetails.country,
+        areaPincode: addressDetails.areaPincode,
+        mobileNumber: addressDetails.mobileNumber,
       },
       totalProduct: payment.totalProduct,
       totalCartAmount: payment.totalCartAmount,
@@ -323,6 +269,96 @@ export const updatePaymentIntent = async (stripePayment: any) => {
         for (const product of payment.totalProduct) {
           await Cart.deleteOne({ _id: product.cartId });
         }
+        const findUser = await Auth.findById({ _id: payment.buyerUserId });
+        const formattedDateAndTime = moment(payment.createdAt).format(
+          "DD-MM-YYYY h:mm A"
+        );
+        const dateTimeFormat = formattedDateAndTime.split(" ");
+        const date = dateTimeFormat[0];
+        const time = dateTimeFormat[1];
+        const dayTime = dateTimeFormat[2];
+
+        let confirmOrderHTML = "";
+        for (const product of payment.totalProduct) {
+          confirmOrderHTML += `
+          <tr>
+          <td width="35%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+            ${product.productName}
+          </td>
+          <td width="23%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+            ${product.productQuantity}
+          </td>
+          <td width="24%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+            ₹ ${product.productPrice}
+          </td>
+          <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+            ₹ ${product.itemPrice}
+          </td>
+        </tr>
+          `;
+        }
+        const address = await Address.findById({ _id: payment.addressId });
+
+        let orderDataToUser = await orderConfirmTemplateToUser(
+          findUser?.fullName || "",
+          findUser?.email || "",
+          payment.totalCartAmount,
+          date,
+          time,
+          dayTime,
+          confirmOrderHTML,
+          payment.orderNumber,
+          address?.streetAddress || "",
+          address?.nearByAddress || "",
+          address?.city || "",
+          address?.state || "",
+          address?.country || "",
+          address?.areaPincode || 0,
+          address?.mobileNumber || 0
+        );
+
+        const userMailOptions = {
+          from: envConfig.Mail_From,
+          to: findUser?.email || "",
+          subject: "Order Placed Confirmation",
+          html: orderDataToUser,
+        };
+
+        transporter.sendMail(userMailOptions, (err) => {
+          if (err) {
+            console.error("Error sending email to user:", err);
+          }
+        });
+        let orderDataToAdmin = await orderConfirmTemplateToAdmin(
+          findUser?.fullName || "",
+          findUser?.email || "",
+          payment.totalCartAmount,
+          date,
+          time,
+          dayTime,
+          confirmOrderHTML,
+          payment.orderNumber,
+          address?.streetAddress || "",
+          address?.nearByAddress || "",
+          address?.city || "",
+          address?.state || "",
+          address?.country || "",
+          address?.areaPincode || 0,
+          address?.mobileNumber || 0
+        );
+
+        // Send notification email to the admin
+        const adminMailOptions = {
+          from: envConfig.Mail_From,
+          to: "vishal.kumar@technocratshorizons.com",
+          subject: "Order Placed Confirmation",
+          html: orderDataToAdmin,
+        };
+        transporter.sendMail(adminMailOptions, (err) => {
+          if (err) {
+            console.error("Error sending email to admin:", err);
+          }
+        });
       }
       return true;
     } else {
@@ -367,6 +403,7 @@ export const getPaymentDetails = async (req: CustomRequest) => {
       _id: payment._id,
       totalProduct: payment.totalProduct,
       totalCartAmount: payment.totalCartAmount,
+      addressId: payment.addressId,
       paymentStatus: payment.paymentStatus,
       buyerUserId: payment.buyerUserId,
       createdAt: payment.createdAt,

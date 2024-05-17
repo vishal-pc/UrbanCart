@@ -61,6 +61,7 @@ export const downloadPdfInvoice = async (req: CustomRequest, res: Response) => {
         totalProduct,
         orderNumber,
         createdAt,
+        addressDetails,
       } = paymentData;
       const formattedDateAndTime =
         moment(createdAt).format("DD-MM-YYYY h:mm A");
@@ -90,7 +91,14 @@ export const downloadPdfInvoice = async (req: CustomRequest, res: Response) => {
         time,
         dayTime,
         productRowsHTML,
-        orderNumber
+        orderNumber,
+        addressDetails.mobileNumber,
+        addressDetails.streetAddress,
+        addressDetails.nearByAddress,
+        addressDetails.city,
+        addressDetails.state,
+        addressDetails.areaPincode,
+        addressDetails.country
       );
 
       const browser = await puppeteer.launch();

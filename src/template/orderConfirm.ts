@@ -1,12 +1,20 @@
 // Order confirmation template for User
 export const orderConfirmTemplateToUser = async (
   fullName: string,
+  email: string,
   totalCartAmount: number,
   date: string,
   time: string,
   dayTime: string,
   confirmOrderHTML: string,
-  orderNumber: string
+  orderNumber: string,
+  streetAddress: string,
+  nearByAddress: string,
+  city: string,
+  state: string,
+  country: string,
+  areaPincode: number,
+  mobileNumber: number
 ) => {
   return `<!DOCTYPE html>
   <html>
@@ -162,32 +170,32 @@ export const orderConfirmTemplateToUser = async (
                <tr>
                   <td align="center" height="100%" valign="top" width="100%" style="padding: 0 35px 35px 35px; background-color: #ffffff;" bgcolor="#ffffff">
                   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
-                      <!-- <tr>
-                          <td align="center" valign="top" style="font-size:0;">
-                              <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
-  
-                                  <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
-                                      <tr>
-                                          <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-                                              <p style="font-weight: 800;">Delivery Address</p>
-                                              <p>675 Massachusetts Avenue<br>11th Floor<br>Cambridge, MA 02139</p>
-  
-                                          </td>
-                                      </tr>
-                                  </table>
-                              </div>
-                              <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
-                                  <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
-                                      <tr>
-                                          <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-                                              <p style="font-weight: 800;">Estimated Delivery Date</p>
-                                              <p>January 1st, 2016</p>
-                                          </td>
-                                      </tr>
-                                  </table>
-                              </div>
-                          </td>
-                      </tr> -->
+                  <tr>
+                  <td align="center" valign="top" style="font-size:0;">
+                      <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
+
+                          <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+                              <tr>
+                                  <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+                                      <p style="font-weight: 800;">Delivery Address</p>
+                                      <p>${streetAddress}<br>${nearByAddress}<br>${city}, ${state}<br>${country}, ${areaPincode}</p>
+
+                                  </td>
+                              </tr>
+                          </table>
+                      </div>
+                      <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
+                          <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+                              <tr>
+                                  <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+                                      <p style="font-weight: 800;">User Information</p>
+                                      <p>Mobile: ${mobileNumber}<br>Email: ${email}</p>
+                                  </td>
+                              </tr>
+                          </table>
+                      </div>
+                  </td>
+              </tr>
                   </table>
                   </td>
               </tr>
@@ -240,12 +248,20 @@ export const orderConfirmTemplateToUser = async (
 // Order confirmation template for Admin
 export const orderConfirmTemplateToAdmin = (
   fullName: string,
+  email: string,
   totalCartAmount: number,
   date: string,
   time: string,
   dayTime: string,
   confirmOrderHTML: string,
-  orderNumber: string
+  orderNumber: string,
+  streetAddress: string,
+  nearByAddress: string,
+  city: string,
+  state: string,
+  country: string,
+  areaPincode: number,
+  mobileNumber: number
 ) => {
   return `<!DOCTYPE html>
   <html>
@@ -393,32 +409,32 @@ export const orderConfirmTemplateToAdmin = (
                <tr>
                   <td align="center" height="100%" valign="top" width="100%" style=" background-color: #ffffff;" bgcolor="#ffffff">
                   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
-                      <!-- <tr>
-                          <td align="center" valign="top" style="font-size:0;">
-                              <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
-  
-                                  <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
-                                      <tr>
-                                          <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-                                              <p style="font-weight: 800;">Delivery Address</p>
-                                              <p>675 Massachusetts Avenue<br>11th Floor<br>Cambridge, MA 02139</p>
-  
-                                          </td>
-                                      </tr>
-                                  </table>
-                              </div>
-                              <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
-                                  <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
-                                      <tr>
-                                          <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-                                              <p style="font-weight: 800;">Estimated Delivery Date</p>
-                                              <p>January 1st, 2016</p>
-                                          </td>
-                                      </tr>
-                                  </table>
-                              </div>
-                          </td>
-                      </tr> -->
+                  <tr>
+                  <td align="center" valign="top" style="font-size:0;">
+                      <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
+
+                          <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+                              <tr>
+                                  <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+                                      <p style="font-weight: 800;">Delivery Address</p>
+                                      <p>${streetAddress}<br>${nearByAddress}<br>${city}, ${state}<br>${country}, ${areaPincode}</p>
+
+                                  </td>
+                              </tr>
+                          </table>
+                      </div>
+                      <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
+                          <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+                              <tr>
+                                  <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+                                      <p style="font-weight: 800;">User Information</p>
+                                      <p>Mobile: ${mobileNumber}<br>Email: ${email}</p>
+                                  </td>
+                              </tr>
+                          </table>
+                      </div>
+                  </td>
+              </tr>
                   </table>
                   </td>
               </tr>
