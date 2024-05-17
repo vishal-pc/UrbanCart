@@ -12,11 +12,14 @@ export interface IPayment extends Document {
     productDescription: string;
     itemPrice: number;
     cartId: string;
+    productImageUrl: string;
   }>;
   stripeUserId: string;
   totalCartAmount: number;
   paymentStatus: "Pending" | "Completed" | "Canceled";
+  orderNumber: string;
   stripePayment: string;
+  addressId: Schema.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -53,6 +56,9 @@ const PaymentSchema = new mongoose.Schema(
         cartId: {
           type: String,
         },
+        productImageUrl: {
+          type: String,
+        },
       },
     ],
     totalCartAmount: {
@@ -66,8 +72,16 @@ const PaymentSchema = new mongoose.Schema(
       enum: ["Pending", "Completed", "Canceled"],
       default: "Pending",
     },
+    orderNumber: {
+      type: String,
+    },
     stripePayment: {
       type: Schema.Types.Mixed,
+    },
+    addressId: {
+      type: Schema.Types.ObjectId,
+      ref: "Address",
+      required: false,
     },
   },
   { timestamps: true }

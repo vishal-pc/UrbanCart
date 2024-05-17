@@ -17,21 +17,6 @@ export const adminRegister = async (req: Request, res: Response) => {
   }
 };
 
-// Get admin user By id
-export const getAdminById = async (req: Request, res: Response) => {
-  try {
-    const result = await adminServices.getAdminById(req);
-    return res.status(result.status).json(result);
-  } catch (error) {
-    console.error("Error in getting user by id", error);
-    return {
-      message: ErrorMessages.SomethingWentWrong,
-      success: false,
-      status: StatusCodes.ServerError.InternalServerError,
-    };
-  }
-};
-
 // Get all users
 export const getAllUsers = async (req: Request, res: Response) => {
   try {

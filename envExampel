@@ -24,3 +24,12 @@ Mail_Username =
 Mail_Password = 
 Mail_From = 
 
+# Stripe credentials
+Stripe_Secret_key=
+Stripe_Public_Key=
+Stripe_Web_Hook_Secret_Key=
+
+# Redirect urls
+Success_Redirect = 
+Cancel_Redirect =
+Get_Payment_By_ID =  

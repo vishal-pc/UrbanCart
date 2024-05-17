@@ -40,8 +40,12 @@ export const SuccessMessages = {
   UserFound: "User found",
   ForgotPasswordSuccess:
     "Reset password OTP has been sent to your email address",
-  ResetPasswordsSuccess: "Password reset successfully",
+  ResetPasswordSuccess: "Password reset successfully",
+  ChangePasswordSuccess: "Password changed successfully",
   DataFound: "Data found",
+  PdfInfo: "pdf info saved",
+  AddressSuccess: "Address saved",
+  AddressFound: "Address found",
 };
 
 export const ErrorMessages = {
@@ -62,6 +66,8 @@ export const ErrorMessages = {
   IncorrectCredentials: "Incorrect email or password",
   PasswordRequirements:
     "Password must have at least 8 characters,one uppercase, one lowercase, one digit, and one special character (#?!@$%^&*-)",
+  IncorrectOldPassword: "The old password does not match.",
+  SamePasswordError: "The new password should not be the same as the old one.",
   SomethingWentWrong: "Something went wrong",
   RegisterError: "Error in register",
   LoginError: "Error in login",
@@ -91,4 +97,6 @@ export const ErrorMessages = {
   PasswordSameError: "Confirm password and password must be the same",
   OtpError: "Invalid OTP or OTP expired",
   DataError: "Data not found",
+  AddressError: "Error in creating address",
+  AddressNotFound: "Address not found",
 };

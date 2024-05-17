@@ -152,29 +152,37 @@ export const getAllProducts = async (
     if (searchQuery) {
       const categoryIds = await Category.find({
         $or: [
-          { categoryName: { $regex: searchQuery, $options: "i" } },
-          { categoryDescription: { $regex: searchQuery, $options: "i" } },
+          { categoryName: { $regex: `^${searchQuery}$`, $options: "i" } },
+          {
+            categoryDescription: { $regex: `^${searchQuery}$`, $options: "i" },
+          },
         ],
       }).distinct("_id");
 
       const subCategoryIds = await SubCategory.find({
         $or: [
-          { subCategoryName: { $regex: searchQuery, $options: "i" } },
-          { subCategoryDescription: { $regex: searchQuery, $options: "i" } },
+          { subCategoryName: { $regex: `^${searchQuery}$`, $options: "i" } },
+          {
+            subCategoryDescription: {
+              $regex: `^${searchQuery}$`,
+              $options: "i",
+            },
+          },
         ],
       }).distinct("_id");
 
       filter.$or = [
-        { productName: { $regex: searchQuery, $options: "i" } },
-        { productDescription: { $regex: searchQuery, $options: "i" } },
+        { productName: { $regex: `^${searchQuery}$`, $options: "i" } },
+        { productDescription: { $regex: `^${searchQuery}$`, $options: "i" } },
         { categoryId: { $in: categoryIds } },
         { subCategoryId: { $in: subCategoryIds } },
       ];
     }
 
-    const skip = (page - 1) * limit;
+    // const skip = (page - 1) * limit;
     const totalCount = await Product.countDocuments(filter);
-    const allProducts = await Product.find(filter).skip(skip).limit(limit);
+    const allProducts = await Product.find(filter);
+    // .skip(skip).limit(limit);
 
     if (allProducts.length > 0) {
       return {
@@ -185,7 +193,7 @@ export const getAllProducts = async (
           products: allProducts,
           totalCount,
           currentPage: page,
-          totalPages: Math.ceil(totalCount / limit),
+          // totalPages: Math.ceil(totalCount / limit),
         },
       };
     } else {
