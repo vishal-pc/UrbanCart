@@ -66,6 +66,8 @@ export const ErrorMessages = {
   IncorrectCredentials: "Incorrect email or password",
   PasswordRequirements:
     "Password must have at least 8 characters,one uppercase, one lowercase, one digit, and one special character (#?!@$%^&*-)",
+  InvalidMobileNumber: "Not a valide mobile number",
+  InvalidPinCodeNumber: "Invalid pin code number",
   IncorrectOldPassword: "The old password does not match.",
   SamePasswordError: "The new password should not be the same as the old one.",
   SomethingWentWrong: "Something went wrong",
