@@ -27,7 +27,7 @@ const format = winston.format.combine(
 );
 
 const transports = [
-  // new winston.transports.Console(),
+  new winston.transports.Console(),
   // new winston.transports.File({
   //   filename: "logs/error.log",
   //   level: "error",
