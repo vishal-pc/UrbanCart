@@ -13,7 +13,6 @@
     }
   ],
   "devCommand": "npm run dev",
-  "startCommand": "npm run start",
   "buildCommand": "npm run build",
   "outputDirectory": "dist"
 }
