@@ -1,5 +1,7 @@
 import { Response } from "express";
 import axios from "axios";
+import fs from "fs";
+import path from "path";
 import puppeteer from "puppeteer";
 import moment from "moment-timezone";
 import {
@@ -25,22 +27,6 @@ const generateUniqueOrderNumber = async () => {
   } while (existingPayment);
 
   return invoiceNumber;
-};
-
-// Helper function to upload PDF buffer to Cloudinary
-const uploadToCloudinary = (buffer: Buffer): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { resource_type: "raw" },
-      (error, result) => {
-        if (error) {
-          return reject(error);
-        }
-        resolve(result);
-      }
-    );
-    stream.end(buffer);
-  });
 };
 
 // Download invoice in pdf
@@ -131,15 +117,21 @@ export const downloadPdfInvoice = async (req: CustomRequest, res: Response) => {
       };
 
       const pdfBuffer = await page.pdf(pdfOptions);
+      const pdfPath = path.join(
+        __dirname,
+        `../../uploads/pdf/${invoiceNumber}.pdf`
+      );
+      await fs.promises.writeFile(pdfPath, pdfBuffer);
       await browser.close();
 
-      const uploadResult = await uploadToCloudinary(pdfBuffer);
+      const uploadResult = await cloudinary.uploader.upload(pdfPath);
+      const secure_url = uploadResult.secure_url;
 
       const newInvoice = new Invoice({
         buyerUserId: userId,
         paymentId: paymentId,
         productId: totalProduct.map((product: any) => product._id),
-        pdfUrl: uploadResult.secure_url,
+        pdfUrl: secure_url,
         invoiceNumber: invoiceNumber,
         orderNumber: orderNumber,
         totalCartAmount: totalCartAmount,
@@ -152,17 +144,21 @@ export const downloadPdfInvoice = async (req: CustomRequest, res: Response) => {
         success: true,
         pdfUrl: uploadResult.secure_url,
       });
+
+      await fs.promises.unlink(pdfPath);
     } else {
-      return res.status(StatusCodes.ServerError.InternalServerError).json({
+      return {
         message: ErrorMessages.SomethingWentWrong,
         success: false,
-      });
+        status: StatusCodes.ServerError.InternalServerError,
+      };
     }
   } catch (error) {
     console.error("Error generating PDF:", error);
-    return res.status(StatusCodes.ServerError.InternalServerError).json({
+    return {
       message: ErrorMessages.SomethingWentWrong,
       success: false,
-    });
+      status: StatusCodes.ServerError.InternalServerError,
+    };
   }
 };
