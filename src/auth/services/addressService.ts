@@ -86,6 +86,7 @@ export const saveUserAddress = async (addressData: any, req: CustomRequest) => {
         message: SuccessMessages.AddressSuccess,
         status: StatusCodes.Success.Created,
         success: true,
+        data: addressSaved,
       };
     } else {
       return {
