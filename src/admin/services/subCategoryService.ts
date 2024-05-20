@@ -7,14 +7,17 @@ import Category, { ICategories } from "../models/categoriesModel";
 import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
 import SubCategory, { ISubcategory } from "../models/subCategoriesModels";
 import Auth from "../../auth/models/authModel";
+import cloudinary from "../../middleware/cloudflare/cloudinary";
 
 // Create a new category
 export const createSubCategory = async (
   subCategoryData: any,
-  req: CustomRequest
+  req: CustomRequest,
+  file: Express.Multer.File
 ) => {
   const { subCategoryName, subCategoryDescription, categoryName } =
     subCategoryData;
+  const tempPath = file?.path;
   try {
     const requiredFields = [
       "subCategoryName",
@@ -62,10 +65,20 @@ export const createSubCategory = async (
         status: StatusCodes.ClientError.NotFound,
       };
     }
+    if (!file) {
+      return {
+        message: ErrorMessages.FileUploadError,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const uploadResult = await cloudinary.uploader.upload(tempPath);
+    const secure_url = uploadResult.secure_url;
 
     const newsubcategories: ISubcategory = new SubCategory({
       subCategoryName,
       subCategoryDescription,
+      subCategoryImg: secure_url,
       categoryId: foundCategory._id,
       createdBy: foundUser,
     });
@@ -78,6 +91,7 @@ export const createSubCategory = async (
         _id: savedSubCategory._id,
         subCategoryName: savedSubCategory.subCategoryName,
         subCategoryDescription: savedSubCategory.subCategoryDescription,
+        subCategoryImg: savedSubCategory.subCategoryImg,
         categoryId: {
           _id: foundCategory?._id,
           categoryName: foundCategory?.categoryName,
@@ -126,6 +140,7 @@ export const getAllSubcategories = async (req: CustomRequest) => {
         _id: subcategory._id,
         subCategoryName: subcategory.subCategoryName,
         subCategoryDescription: subcategory.subCategoryDescription,
+        subCategoryImg: subcategory.subCategoryImg,
         categoryId: subcategory.categoryId,
         createdBy: subcategory.createdBy,
         createdAt: subcategory.createdAt,
@@ -173,6 +188,7 @@ export const getSubcategoriesById = async (
         _id: subcategory._id,
         subCategoryName: subcategory.subCategoryName,
         subCategoryDescription: subcategory.subCategoryDescription,
+        subCategoryImg: subcategory.subCategoryImg,
         categoryId: subcategory.categoryId,
         createdBy: subcategory.createdBy,
         createdAt: subcategory.createdAt,
@@ -180,6 +196,82 @@ export const getSubcategoriesById = async (
       },
     };
   } catch (error) {
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Update a product by ID
+export const updateSubCategoryById = async (
+  subCategoryId: string,
+  updatedData: any,
+  file: Express.Multer.File
+) => {
+  try {
+    const subCategory = await SubCategory.findById(subCategoryId);
+
+    if (!subCategory) {
+      return {
+        message: ErrorMessages.SubcategoriesNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    if (file) {
+      const tempPath = file.path;
+      const uploadResult = await cloudinary.uploader.upload(tempPath);
+      const secure_url = uploadResult.secure_url;
+      subCategory.subCategoryImg = secure_url;
+    }
+
+    if (updatedData.subCategoryName)
+      subCategory.subCategoryName = updatedData.subCategoryName;
+    if (updatedData.subCategoryDescription)
+      subCategory.subCategoryDescription = updatedData.subCategoryDescription;
+
+    const updatedSubCategory = await subCategory.save();
+
+    return {
+      message: SuccessMessages.SubCategoriesUpdate,
+      success: true,
+      status: StatusCodes.Success.Ok,
+      data: updatedSubCategory,
+    };
+  } catch (error) {
+    console.error("Error in updating subcategory", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Delete a product by ID
+export const deleteSubCategoryById = async (subCategoryId: string) => {
+  try {
+    const subCategory = await SubCategory.findById(subCategoryId);
+
+    if (!subCategory) {
+      return {
+        message: ErrorMessages.SubcategoriesNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+
+    await subCategory.deleteOne();
+
+    return {
+      message: SuccessMessages.SubCategoriesDelete,
+      success: true,
+      status: StatusCodes.Success.Ok,
+    };
+  } catch (error) {
+    console.error("Error in deleting category", error);
     return {
       message: ErrorMessages.SomethingWentWrong,
       success: false,

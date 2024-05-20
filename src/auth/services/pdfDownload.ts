@@ -95,8 +95,8 @@ export const downloadPdfInvoice = async (req: CustomRequest, res: Response) => {
         addressDetails.mobileNumber,
         addressDetails.streetAddress,
         addressDetails.nearByAddress,
-        addressDetails.city,
-        addressDetails.state,
+        addressDetails.cityName,
+        addressDetails.stateName,
         addressDetails.areaPincode,
         addressDetails.country
       );

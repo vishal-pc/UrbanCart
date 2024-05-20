@@ -49,3 +49,38 @@ export const getUserAddressById = async (req: Request, res: Response) => {
     };
   }
 };
+
+// Update user address by id
+export const updateUserAddress = async (req: Request, res: Response) => {
+  try {
+    const result = await addressService.updateUserAddress(
+      req.params.addressId,
+      req.body
+    );
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.error("Error in update user address", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Delete a user address
+export const deleteUserAddressById = async (req: Request, res: Response) => {
+  try {
+    const result = await addressService.deleteUserAddressById(
+      req.params.addressId
+    );
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.error("Error in delete user address", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};

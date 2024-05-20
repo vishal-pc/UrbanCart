@@ -40,6 +40,7 @@ adminRouter.get(
 adminRouter.post(
   "/create-category",
   verifyAuthToken(["admin"]),
+  upload.single("categoryImg"),
   categoryController.createCategory
 );
 adminRouter.get(
@@ -52,11 +53,23 @@ adminRouter.get(
   verifyAuthToken(["admin"]),
   categoryController.getCategoryById
 );
+adminRouter.patch(
+  "/update-category/:categoryId",
+  verifyAuthToken(["admin"]),
+  upload.single("categoryImg"),
+  categoryController.updateCategoryById
+);
+adminRouter.delete(
+  "/delete-category/:categoryId",
+  verifyAuthToken(["admin"]),
+  categoryController.deleteCategoryById
+);
 
 // Sub categories routes
 adminRouter.post(
   "/create-sub-category",
   verifyAuthToken(["admin"]),
+  upload.single("subCategoryImg"),
   subCategoryController.createSubCategory
 );
 adminRouter.get(
@@ -68,6 +81,17 @@ adminRouter.get(
   "/get-sub-category/:subCategoryId",
   verifyAuthToken(["admin"]),
   subCategoryController.getSubcategoriesById
+);
+adminRouter.patch(
+  "/update-sub-category/:subCategoryId",
+  verifyAuthToken(["admin"]),
+  upload.single("subCategoryImg"),
+  subCategoryController.updateSubCategoryById
+);
+adminRouter.delete(
+  "/delete-sub-category/:subCategoryId",
+  verifyAuthToken(["admin"]),
+  subCategoryController.deleteSubCategoryById
 );
 
 // Product routes

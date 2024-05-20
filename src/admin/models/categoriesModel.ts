@@ -4,6 +4,7 @@ export interface ICategories extends Document {
   _id: any;
   categoryName: string;
   categoryDescription: string;
+  categoryImg: string;
   createdBy: Schema.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -15,6 +16,9 @@ const categorySchema = new mongoose.Schema(
       type: String,
     },
     categoryDescription: {
+      type: String,
+    },
+    categoryImg: {
       type: String,
     },
     createdBy: {

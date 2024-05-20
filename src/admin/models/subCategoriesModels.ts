@@ -4,6 +4,7 @@ export interface ISubcategory extends Document {
   _id: any;
   subCategoryName: string;
   subCategoryDescription: string;
+  subCategoryImg: string;
   createdBy: Schema.Types.ObjectId;
   categoryId: Schema.Types.ObjectId;
   createdAt: Date;
@@ -16,6 +17,9 @@ const subCategorySchema = new mongoose.Schema(
       type: String,
     },
     subCategoryDescription: {
+      type: String,
+    },
+    subCategoryImg: {
       type: String,
     },
     categoryId: {

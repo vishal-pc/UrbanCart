@@ -23,8 +23,12 @@ export const SuccessMessages = {
   SignInSuccess: "Sign-in successful",
   CategoriesSuccess: "Categorie created successfully",
   CategoriesFoundSuccess: "Categories found successfully",
+  CategoriesDelete: "Categories delete successfully",
+  CategoriesUpdate: "Categories updated successfully",
   SubCategoriesSuccess: "Subcategorie created successfully",
   SubCategoriesFoundSuccess: "Subcategories found successfully",
+  SubCategoriesDelete: "Subcategorie delete successfully",
+  SubCategoriesUpdate: "Subcategorie updated successfully",
   ProductSuccess: "Product created successfully",
   ProductFoundSuccess: "Product found successfully",
   ProductUpdatedSuccess: "Product updated successfully",
@@ -46,6 +50,8 @@ export const SuccessMessages = {
   PdfInfo: "pdf info saved",
   AddressSuccess: "Address saved",
   AddressFound: "Address found",
+  AddressUpdated: "Address updated",
+  AddressDelete: "Address deleted",
 };
 
 export const ErrorMessages = {
