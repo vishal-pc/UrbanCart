@@ -1,18 +1,15 @@
 {
-  "version": 2.0,
-  "builds": [
-    {
-      "src": "../src/server.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/"
-    }
-  ],
-  "devCommand": "npm run dev",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist"
-}
+    "version": 2.0,
+    "builds": [
+      {
+        "src": "src/server.ts",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "src/server.ts"
+      }
+    ]
+  }
