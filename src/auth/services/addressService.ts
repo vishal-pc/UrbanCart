@@ -16,8 +16,10 @@ export const saveUserAddress = async (addressData: any, req: CustomRequest) => {
     const {
       mobileNumber,
       country,
-      state,
-      city,
+      stateId,
+      stateName,
+      cityId,
+      cityName,
       streetAddress,
       nearByAddress,
       areaPincode,
@@ -36,8 +38,8 @@ export const saveUserAddress = async (addressData: any, req: CustomRequest) => {
     const requiredFields = [
       "mobileNumber",
       "country",
-      "state",
-      "city",
+      "stateName",
+      "cityName",
       "streetAddress",
       "nearByAddress",
       "areaPincode",
@@ -70,8 +72,10 @@ export const saveUserAddress = async (addressData: any, req: CustomRequest) => {
       loggedInUserId: userId,
       mobileNumber,
       country,
-      state,
-      city,
+      stateId,
+      stateName,
+      cityId,
+      cityName,
       streetAddress,
       nearByAddress,
       areaPincode,
@@ -170,6 +174,109 @@ export const getUserAddressById = async (
     };
   } catch (error) {
     console.error("Error in get user address", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Update user address by id
+export const updateUserAddress = async (
+  addressId: string,
+  addressData: any
+) => {
+  try {
+    if (!addressId) {
+      return {
+        message: ErrorMessages.AddressNotFound,
+        success: false,
+        status: StatusCodes.ClientError.BadRequest,
+      };
+    }
+
+    if (
+      addressData.mobileNumber &&
+      !validateMobileNumber(addressData.mobileNumber)
+    ) {
+      return {
+        message: ErrorMessages.InvalidMobileNumber,
+        status: StatusCodes.ClientError.BadRequest,
+        success: false,
+      };
+    }
+
+    if (addressData.areaPincode && !validatePinCode(addressData.areaPincode)) {
+      return {
+        message: ErrorMessages.InvalidPinCodeNumber,
+        status: StatusCodes.ClientError.BadRequest,
+        success: false,
+      };
+    }
+
+    const updatedFields: any = {};
+    if (addressData.mobileNumber)
+      updatedFields.mobileNumber = addressData.mobileNumber;
+    if (addressData.country) updatedFields.country = addressData.country;
+    if (addressData.stateId) updatedFields.stateId = addressData.stateId;
+    if (addressData.stateName) updatedFields.stateName = addressData.stateName;
+    if (addressData.cityId) updatedFields.cityId = addressData.cityId;
+    if (addressData.cityName) updatedFields.cityName = addressData.cityName;
+    if (addressData.streetAddress)
+      updatedFields.streetAddress = addressData.streetAddress;
+    if (addressData.nearByAddress)
+      updatedFields.nearByAddress = addressData.nearByAddress;
+    if (addressData.areaPincode)
+      updatedFields.areaPincode = addressData.areaPincode;
+
+    const addressUpdated = await Address.findByIdAndUpdate(
+      addressId,
+      { $set: updatedFields },
+      { new: true }
+    );
+
+    if (addressUpdated) {
+      return {
+        message: SuccessMessages.AddressUpdated,
+        status: StatusCodes.Success.Ok,
+        success: true,
+      };
+    } else {
+      return {
+        message: ErrorMessages.AddressError,
+        success: false,
+        status: StatusCodes.ServerError.InternalServerError,
+      };
+    }
+  } catch (error) {
+    console.error("Error in update user address", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Delete a user address
+export const deleteUserAddressById = async (addressId: string) => {
+  try {
+    const subCategory = await Address.findById(addressId);
+    if (!subCategory) {
+      return {
+        message: ErrorMessages.AddressNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    await Address.deleteOne();
+    return {
+      message: SuccessMessages.AddressDelete,
+      status: StatusCodes.Success.Ok,
+      success: true,
+    };
+  } catch (error) {
     return {
       message: ErrorMessages.SomethingWentWrong,
       success: false,

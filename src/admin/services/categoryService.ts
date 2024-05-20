@@ -6,10 +6,16 @@ import {
 import Category, { ICategories } from "../models/categoriesModel";
 import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
 import Auth from "../../auth/models/authModel";
+import cloudinary from "../../middleware/cloudflare/cloudinary";
 
 // Create a new category
-export const createCategory = async (categoryData: any, req: CustomRequest) => {
+export const createCategory = async (
+  categoryData: any,
+  req: CustomRequest,
+  file: Express.Multer.File
+) => {
   const { categoryName, categoryDescription } = categoryData;
+  const tempPath = file?.path;
   try {
     const requiredFields = ["categoryName", "categoryDescription"];
     const missingFields = requiredFields.filter(
@@ -43,9 +49,20 @@ export const createCategory = async (categoryData: any, req: CustomRequest) => {
     const userId = user.userId;
     const foundUser = await Auth.findById({ _id: userId });
 
+    if (!file) {
+      return {
+        message: ErrorMessages.FileUploadError,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const uploadResult = await cloudinary.uploader.upload(tempPath);
+    const secure_url = uploadResult.secure_url;
+
     const newCategory: ICategories = new Category({
       categoryName,
       categoryDescription,
+      categoryImg: secure_url,
       createdBy: foundUser,
     });
     const savedCategory: ICategories = await newCategory.save();
@@ -57,6 +74,7 @@ export const createCategory = async (categoryData: any, req: CustomRequest) => {
         _id: savedCategory._id,
         categoryName: savedCategory.categoryName,
         categoryDescription: savedCategory.categoryDescription,
+        categoryImg: savedCategory.categoryImg,
         createdBy: {
           _id: foundUser?._id,
           fullname: foundUser?.fullName,
@@ -144,6 +162,82 @@ export const getCategoryById = async (
       status: StatusCodes.ClientError.NotFound,
     };
   } catch (error) {
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Update a product by ID
+export const updateCategoryById = async (
+  categoryId: string,
+  updatedData: any,
+  file: Express.Multer.File
+) => {
+  try {
+    const category = await Category.findById(categoryId);
+
+    if (!category) {
+      return {
+        message: ErrorMessages.CategoriesNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    if (file) {
+      const tempPath = file.path;
+      const uploadResult = await cloudinary.uploader.upload(tempPath);
+      const secure_url = uploadResult.secure_url;
+      category.categoryImg = secure_url;
+    }
+
+    if (updatedData.categoryName)
+      category.categoryName = updatedData.categoryName;
+    if (updatedData.categoryDescription)
+      category.categoryDescription = updatedData.categoryDescription;
+
+    const updatedcategory = await category.save();
+
+    return {
+      message: SuccessMessages.CategoriesUpdate,
+      success: true,
+      status: StatusCodes.Success.Ok,
+      data: updatedcategory,
+    };
+  } catch (error) {
+    console.error("Error in updating category", error);
+    return {
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    };
+  }
+};
+
+// Delete a product by ID
+export const deleteCategoryById = async (categoryId: string) => {
+  try {
+    const category = await Category.findById(categoryId);
+
+    if (!category) {
+      return {
+        message: ErrorMessages.CategoriesNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+
+    await category.deleteOne();
+
+    return {
+      message: SuccessMessages.CategoriesDelete,
+      success: true,
+      status: StatusCodes.Success.Ok,
+    };
+  } catch (error) {
+    console.error("Error in deleting category", error);
     return {
       message: ErrorMessages.SomethingWentWrong,
       success: false,

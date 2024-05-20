@@ -10,8 +10,8 @@ export const orderConfirmTemplateToUser = async (
   orderNumber: string,
   streetAddress: string,
   nearByAddress: string,
-  city: string,
-  state: string,
+  cityName: string,
+  stateName: string,
   country: string,
   areaPincode: number,
   mobileNumber: number
@@ -178,7 +178,7 @@ export const orderConfirmTemplateToUser = async (
                               <tr>
                                   <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
                                       <p style="font-weight: 800;">Delivery Address</p>
-                                      <p>${streetAddress}<br>${nearByAddress}<br>${city}, ${state}<br>${country}, ${areaPincode}</p>
+                                      <p>${streetAddress}<br>${nearByAddress}<br>${cityName}, ${stateName}<br>${country}, ${areaPincode}</p>
 
                                   </td>
                               </tr>
@@ -257,8 +257,8 @@ export const orderConfirmTemplateToAdmin = (
   orderNumber: string,
   streetAddress: string,
   nearByAddress: string,
-  city: string,
-  state: string,
+  cityName: string,
+  stateName: string,
   country: string,
   areaPincode: number,
   mobileNumber: number
@@ -341,6 +341,7 @@ export const orderConfirmTemplateToAdmin = (
                   <td align="center" style="padding: 35px 35px 2px 35px; background-color: #ffffff;" bgcolor="#ffffff">
                   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
                     <h2>${fullName} has placed the order</h2>
+                    <p>Mobile: ${mobileNumber}<br>Email: ${email}</p>
                       <tr>
                           <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 1px; ">
                               <img src="https://img.icons8.com/carbon-copy/100/000000/checked-checkbox.png" width="125" height="120" style="display: block; border: 0px;" /><br>
@@ -392,10 +393,10 @@ export const orderConfirmTemplateToAdmin = (
                           <td align="left" style="padding-top: 20px;">
                               <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                   <tr>
-                                      <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; ">
+                                      <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
                                           SUB TOTAL
                                       </td>
-                                      <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; ">
+                                      <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
                                       ₹ ${totalCartAmount}
                                       </td>
                                   </tr>
@@ -407,48 +408,37 @@ export const orderConfirmTemplateToAdmin = (
                   </td>
               </tr>
                <tr>
-                  <td align="center" height="100%" valign="top" width="100%" style=" background-color: #ffffff;" bgcolor="#ffffff">
-                  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
-                  <tr>
-                  <td align="center" valign="top" style="font-size:0;">
-                      <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
+                  <td align="center" height="100%" valign="top"  style=" background-color: #ffffff;" bgcolor="#ffffff">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0"  style="max-width:660px;">
+                            <tr>
+                                <td align="center" valign="top" style="font-size:0;">
+                                    <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; ">
+                                        <table align="center" border="0" cellpadding="0" cellspacing="0"  style="max-width:300px;">
+                                            <tr>
+                                                <td align="center" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+                                                    <p style="font-weight: 800;">Delivery Address</p>
+                                                    <p>${streetAddress}<br>${nearByAddress}<br>${cityName}, ${stateName}<br>${country}, ${areaPincode}</p>
 
-                          <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
-                              <tr>
-                                  <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-                                      <p style="font-weight: 800;">Delivery Address</p>
-                                      <p>${streetAddress}<br>${nearByAddress}<br>${city}, ${state}<br>${country}, ${areaPincode}</p>
-
-                                  </td>
-                              </tr>
-                          </table>
-                      </div>
-                      <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
-                          <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
-                              <tr>
-                                  <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-                                      <p style="font-weight: 800;">User Information</p>
-                                      <p>Mobile: ${mobileNumber}<br>Email: ${email}</p>
-                                  </td>
-                              </tr>
-                          </table>
-                      </div>
-                  </td>
-              </tr>
-                  </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                    </table>
                   </td>
               </tr>
               <tr>
                   <td align="center" style="background-color: #ffffff;" bgcolor="#ffffff">
-                  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
-                      <tr>
-                          <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 24px; padding: 5px 0 10px 0; border-top: 3px solid #eeeeee;">
-                              <p style="font-size: 14px; font-weight: 800; line-height: 18px; color: #333333;">
-                                ZipKart<br>1231 Street, Modal Gram<br>Ludhiana, Punjab-141002
-                              </p>
-                          </td>
-                      </tr>
-                  </table>
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
+                        <tr>
+                            <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 24px; padding: 5px 0 10px 0; border-top: 3px solid #eeeeee;">
+                                <p style="font-size: 14px; font-weight: 800; line-height: 18px; color: #333333;">
+                                    ZipKart<br>1231 Street, Modal Gram<br>Ludhiana, Punjab-141002
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
                   </td>
               </tr>
           </table>

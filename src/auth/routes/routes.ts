@@ -65,6 +65,16 @@ authRouter.get(
   verifyAuthToken(["user"]),
   addressController.getUserAddressById
 );
+authRouter.patch(
+  "/update-address/:addressId",
+  verifyAuthToken(["user"]),
+  addressController.updateUserAddress
+);
+authRouter.delete(
+  "/delete-address/:addressId",
+  verifyAuthToken(["user"]),
+  addressController.deleteUserAddressById
+);
 
 // Payment routes
 authRouter.post(

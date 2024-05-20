@@ -10,8 +10,8 @@ export const downloadPdf = async (
   mobileNumber: string,
   streetAddress: string,
   nearByAddress: string,
-  city: string,
-  state: string,
+  cityName: string,
+  stateName: string,
   areaPincode: string,
   country: string
 ) => {
@@ -144,7 +144,7 @@ export const downloadPdf = async (
             <h2>Billed To</h2>
             <p>${fullName}</p>
             <p>${streetAddress}, ${nearByAddress}</p>
-            <p>${city}, ${state} - ${areaPincode} - ${country}</p>
+            <p>${cityName}, ${stateName} - ${areaPincode} - ${country}</p>
             <p>91+ ${mobileNumber}</p>
           </div>
           <div class="billing-informations">

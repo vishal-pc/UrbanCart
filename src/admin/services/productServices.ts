@@ -32,6 +32,7 @@ export const createProduct = async (
     productName,
     productPrice,
     productDescription,
+    productStockQuantity,
   } = productData;
   const tempPath = file?.path;
   try {
@@ -41,6 +42,7 @@ export const createProduct = async (
       "productName",
       "productPrice",
       "productDescription",
+      "productStockQuantity",
     ];
     const missingFields = requiredFields.filter((field) => !productData[field]);
 
@@ -88,6 +90,7 @@ export const createProduct = async (
       productName,
       productPrice,
       productDescription,
+      productStockQuantity,
       productImg: secure_url,
       createdBy: foundUser,
     };
@@ -104,6 +107,7 @@ export const createProduct = async (
           productPrice: productSaved.productPrice,
           productDescription: productSaved.productDescription,
           productImg: productSaved.productImg,
+          productStockQuantity: productSaved.productStockQuantity,
           categoryId: {
             _id: foundCategory._id,
             categoryName: foundCategory.categoryName,
@@ -268,6 +272,8 @@ export const updateProductById = async (
       product.productPrice = updatedData.productPrice;
     if (updatedData.productDescription)
       product.productDescription = updatedData.productDescription;
+    if (updatedData.productStockQuantity)
+      product.productStockQuantity = updatedData.productStockQuantity;
 
     const updatedProduct = await product.save();
 

@@ -8,6 +8,7 @@ export interface IProduct extends Document {
   productPrice: number;
   productImg: string;
   productDescription: string;
+  productStockQuantity: number;
   createdBy: Schema.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -36,6 +37,9 @@ const productSchema = new mongoose.Schema(
     },
     productDescription: {
       type: String,
+    },
+    productStockQuantity: {
+      type: Number,
     },
     createdBy: {
       type: Schema.Types.ObjectId,

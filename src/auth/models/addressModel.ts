@@ -4,8 +4,10 @@ export interface IAddress extends Document {
   loggedInUserId: Schema.Types.ObjectId;
   mobileNumber: number;
   country: string;
-  state: string;
-  city: string;
+  stateId: number;
+  stateName: string;
+  cityId: number;
+  cityName: string;
   streetAddress: string;
   nearByAddress: string;
   areaPincode: number;
@@ -22,8 +24,10 @@ const addressSchema = new mongoose.Schema(
     },
     mobileNumber: { type: Number },
     country: { type: String },
-    state: { type: String },
-    city: { type: String },
+    stateId: { type: Number },
+    stateName: { type: String },
+    cityId: { type: Number },
+    cityName: { type: String },
     streetAddress: { type: String },
     nearByAddress: { type: String },
     areaPincode: { type: Number },
