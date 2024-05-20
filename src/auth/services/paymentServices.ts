@@ -94,7 +94,7 @@ export const processPayment = async (
       const newPayment = new Payment({
         buyerUserId: userId,
         totalProduct: detailedProducts.map((item) => ({
-          to: item.productId,
+          productId: item.productId,
           productName: item.productName,
           productPrice: item.productPrice,
           productQuantity: item.productQuantity,
@@ -113,6 +113,7 @@ export const processPayment = async (
 
       const productMetadata = JSON.stringify(
         totalProduct.map((product) => ({
+          productId: product.productId,
           productName: product.productName,
           productPrice: product.productPrice,
           productQuantity: product.productQuantity,
@@ -267,6 +268,17 @@ export const updatePaymentIntent = async (stripePayment: any) => {
           { $unset: { "totalProduct.$[].cartId": 1 } }
         );
         for (const product of payment.totalProduct) {
+          const productDoc = await Product.findById({ _id: product.productId });
+          if (productDoc) {
+            productDoc.productStockQuantity -= product.productQuantity;
+            await productDoc.save();
+          } else {
+            return {
+              message: ErrorMessages.ProductNotFound,
+              success: false,
+              status: StatusCodes.ClientError.NotFound,
+            };
+          }
           await Cart.deleteOne({ _id: product.cartId });
         }
         const findUser = await Auth.findById({ _id: payment.buyerUserId });
@@ -299,66 +311,70 @@ export const updatePaymentIntent = async (stripePayment: any) => {
         }
         const address = await Address.findById({ _id: payment.addressId });
 
-        let orderDataToUser = await orderConfirmTemplateToUser(
-          findUser?.fullName || "",
-          findUser?.email || "",
-          payment.totalCartAmount,
-          date,
-          time,
-          dayTime,
-          confirmOrderHTML,
-          payment.orderNumber,
-          address?.streetAddress || "",
-          address?.nearByAddress || "",
-          address?.cityName || "",
-          address?.stateName || "",
-          address?.country || "",
-          address?.areaPincode || 0,
-          address?.mobileNumber || 0
-        );
+        setTimeout(async () => {
+          let orderDataToUser = await orderConfirmTemplateToUser(
+            findUser?.fullName || "",
+            findUser?.email || "",
+            payment.totalCartAmount,
+            date,
+            time,
+            dayTime,
+            confirmOrderHTML,
+            payment.orderNumber,
+            address?.streetAddress || "",
+            address?.nearByAddress || "",
+            address?.cityName || "",
+            address?.stateName || "",
+            address?.country || "",
+            address?.areaPincode || 0,
+            address?.mobileNumber || 0
+          );
 
-        const userMailOptions = {
-          from: envConfig.Mail_From,
-          to: findUser?.email || "",
-          subject: "Order Placed Confirmation",
-          html: orderDataToUser,
-        };
+          const userMailOptions = {
+            from: envConfig.Mail_From,
+            to: findUser?.email || "",
+            subject: "Order Placed Confirmation",
+            html: orderDataToUser,
+          };
 
-        transporter.sendMail(userMailOptions, (err) => {
-          if (err) {
-            console.error("Error sending email to user:", err);
-          }
-        });
-        let orderDataToAdmin = await orderConfirmTemplateToAdmin(
-          findUser?.fullName || "",
-          findUser?.email || "",
-          payment.totalCartAmount,
-          date,
-          time,
-          dayTime,
-          confirmOrderHTML,
-          payment.orderNumber,
-          address?.streetAddress || "",
-          address?.nearByAddress || "",
-          address?.cityName || "",
-          address?.stateName || "",
-          address?.country || "",
-          address?.areaPincode || 0,
-          address?.mobileNumber || 0
-        );
+          transporter.sendMail(userMailOptions, (err) => {
+            if (err) {
+              console.error("Error sending email to user:", err);
+            }
+          });
+          let orderDataToAdmin = await orderConfirmTemplateToAdmin(
+            findUser?.fullName || "",
+            findUser?.email || "",
+            payment.totalCartAmount,
+            date,
+            time,
+            dayTime,
+            confirmOrderHTML,
+            payment.orderNumber,
+            address?.streetAddress || "",
+            address?.nearByAddress || "",
+            address?.cityName || "",
+            address?.stateName || "",
+            address?.country || "",
+            address?.areaPincode || 0,
+            address?.mobileNumber || 0
+          );
 
-        // Send notification email to the admin
-        const adminMailOptions = {
-          from: envConfig.Mail_From,
-          to: "vishal.kumar@technocratshorizons.com",
-          subject: "Order Placed Confirmation",
-          html: orderDataToAdmin,
-        };
-        transporter.sendMail(adminMailOptions, (err) => {
-          if (err) {
-            console.error("Error sending email to admin:", err);
-          }
-        });
+          const adminUsers = await Auth.find({ IsAdmin: true });
+          const adminEmails = adminUsers.map((admin) => admin.email);
+          // Send notification email to the admin
+          const adminMailOptions = {
+            from: envConfig.Mail_From,
+            to: adminEmails,
+            subject: "Order Placed Confirmation",
+            html: orderDataToAdmin,
+          };
+          transporter.sendMail(adminMailOptions, (err) => {
+            if (err) {
+              console.error("Error sending email to admin:", err);
+            }
+          });
+        }, 15000);
       }
       return true;
     } else {
