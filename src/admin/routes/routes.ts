@@ -29,7 +29,7 @@ const upload = multer({ storage: storage });
 adminRouter.post("/create-role", roleController.createRole);
 
 // Admin routes
-adminRouter.post("/register", adminController.adminRegister);
+adminRouter.post("/register", adminController.registerAdmin);
 adminRouter.get(
   "/get-all-users",
   verifyAuthToken(["admin"]),

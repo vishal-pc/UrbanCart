@@ -1,33 +1,134 @@
 import { Request, Response } from "express";
-import * as authService from "../services/authServices";
-import { StatusCodes, ErrorMessages } from "../../validation/responseMessages";
+import Auth from "../models/authModel";
+import bcrypt from "bcryptjs";
+import { emailValidate, passwordRegex } from "../../helpers/helper";
+import {
+  StatusCodes,
+  SuccessMessages,
+  ErrorMessages,
+} from "../../validation/responseMessages";
+import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
+import { Role } from "../../admin/models/roleModel";
 
-// User register
+// User Register
 export const authRegister = async (req: Request, res: Response) => {
+  const { fullName, email, password } = req.body;
   try {
-    const result = await authService.authRegister(req.body);
-    return res.status(result.status).json(result);
+    const requiredFields = ["fullName", "email", "password"];
+    const missingFields = requiredFields.filter((field) => !req.body[field]);
+
+    if (missingFields.length > 0) {
+      const missingFieldsMessage = missingFields.join(", ");
+      return res.json({
+        message: ErrorMessages.MissingFields(missingFieldsMessage),
+        success: false,
+        status: StatusCodes.ClientError.BadRequest,
+      });
+    }
+
+    if (!emailValidate(email)) {
+      return res.json({
+        message: ErrorMessages.EmailInvalid,
+        success: false,
+        status: StatusCodes.ClientError.BadRequest,
+      });
+    }
+
+    const existingUser = await Auth.findOne({ email });
+    if (existingUser) {
+      return res.json({
+        message: ErrorMessages.UserExists(email),
+        success: false,
+        status: StatusCodes.ClientError.BadRequest,
+      });
+    }
+
+    if (!passwordRegex.test(password)) {
+      return res.json({
+        message: ErrorMessages.PasswordRequirements,
+        success: false,
+        status: StatusCodes.ClientError.BadRequest,
+      });
+    }
+    const defaultRole = await Role.findOne({ role: "user" });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = {
+      fullName,
+      email,
+      password: hashedPassword,
+      role: defaultRole,
+    };
+
+    const userSaved = await Auth.create(newUser);
+    if (userSaved.id) {
+      return res.json({
+        message: SuccessMessages.RegisterSuccess,
+        status: StatusCodes.Success.Created,
+        success: true,
+      });
+    } else {
+      return res.json({
+        message: ErrorMessages.RegisterError,
+        success: false,
+        status: StatusCodes.ServerError.InternalServerError,
+      });
+    }
   } catch (error) {
-    console.error("Error in register", error);
-    return {
+    console.error("Error in user register", error);
+    return res.json({
       message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
-    };
+    });
   }
 };
 
 // Get auth user By id
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (req: CustomRequest, res: Response) => {
   try {
-    const result = await authService.getUserById(req);
-    return res.status(result.status).json(result);
+    const user = req.user as userType;
+    if (!user) {
+      return res.json({
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      });
+    }
+    const userId = user.userId;
+    const foundedUser = await Auth.findById({ _id: userId }).populate(
+      "role",
+      "role"
+    );
+    if (!foundedUser) {
+      return res.json({
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      });
+    }
+    const userData = {
+      _id: foundedUser.id,
+      fullName: foundedUser.fullName,
+      email: foundedUser.email,
+      role: foundedUser.role,
+      createdAt: foundedUser.createdAt,
+      updatedAt: foundedUser.updatedAt,
+    };
+    return res.json({
+      message: SuccessMessages.UserFound,
+      status: StatusCodes.Success.Ok,
+      success: true,
+      userData,
+    });
   } catch (error) {
     console.error("Error in getting user by id", error);
-    return {
-      message: ErrorMessages.UserNotFound,
+    return res.json({
+      message: ErrorMessages.SomethingWentWrong,
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
-    };
+    });
   }
 };

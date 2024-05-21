@@ -1,7 +1,5 @@
 import { Response } from "express";
 import axios from "axios";
-import fs from "fs";
-import path from "path";
 import puppeteer from "puppeteer";
 import moment from "moment-timezone";
 import {
@@ -105,7 +103,7 @@ export const downloadPdfInvoice = async (req: CustomRequest, res: Response) => {
       const page = await browser.newPage();
       await page.setContent(pdfdata);
 
-      const pdfOptions: any = {
+      const pdfBuffer = await page.pdf({
         format: "A4",
         margin: {
           top: "20px",
@@ -114,51 +112,58 @@ export const downloadPdfInvoice = async (req: CustomRequest, res: Response) => {
           left: "20px",
         },
         printBackground: true,
-      };
-
-      const pdfBuffer = await page.pdf(pdfOptions);
-      const pdfPath = path.join(
-        __dirname,
-        `../../uploads/pdf/${invoiceNumber}.pdf`
-      );
-      await fs.promises.writeFile(pdfPath, pdfBuffer);
+      });
       await browser.close();
 
-      const uploadResult = await cloudinary.uploader.upload(pdfPath);
-      const secure_url = uploadResult.secure_url;
+      const uploadResult = await cloudinary.uploader.upload_stream(
+        { resource_type: "image", format: "pdf" },
+        (error: any, result: any) => {
+          if (error) {
+            console.error("Error uploading to Cloudinary:", error);
+            return res
+              .status(StatusCodes.ServerError.InternalServerError)
+              .json({
+                message: ErrorMessages.SomethingWentWrong,
+                success: false,
+              });
+          }
 
-      const newInvoice = new Invoice({
-        buyerUserId: userId,
-        paymentId: paymentId,
-        productId: totalProduct.map((product: any) => product._id),
-        pdfUrl: secure_url,
-        invoiceNumber: invoiceNumber,
-        orderNumber: orderNumber,
-        totalCartAmount: totalCartAmount,
-      });
+          const newInvoice = new Invoice({
+            buyerUserId: userId,
+            paymentId: paymentId,
+            productId: totalProduct.map((product: any) => product._id),
+            pdfUrl: result.secure_url,
+            invoiceNumber: invoiceNumber,
+            orderNumber: orderNumber,
+            totalCartAmount: totalCartAmount,
+          });
 
-      await newInvoice.save();
+          newInvoice.save();
 
-      res.status(StatusCodes.Success.Created).json({
-        message: SuccessMessages.PdfInfo,
-        success: true,
-        pdfUrl: uploadResult.secure_url,
-      });
+          res.status(StatusCodes.Success.Created).json({
+            message: SuccessMessages.PdfInfo,
+            success: true,
+            pdfUrl: result.secure_url,
+          });
+        }
+      );
 
-      await fs.promises.unlink(pdfPath);
+      // Convert buffer to readable stream and pipe to cloudinary upload
+      const stream = require("stream");
+      const bufferStream = new stream.PassThrough();
+      bufferStream.end(pdfBuffer);
+      bufferStream.pipe(uploadResult);
     } else {
-      return {
+      return res.status(StatusCodes.ServerError.InternalServerError).json({
         message: ErrorMessages.SomethingWentWrong,
         success: false,
-        status: StatusCodes.ServerError.InternalServerError,
-      };
+      });
     }
   } catch (error) {
     console.error("Error generating PDF:", error);
-    return {
+    return res.status(StatusCodes.ServerError.InternalServerError).json({
       message: ErrorMessages.SomethingWentWrong,
       success: false,
-      status: StatusCodes.ServerError.InternalServerError,
-    };
+    });
   }
 };
