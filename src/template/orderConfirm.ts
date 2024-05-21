@@ -64,7 +64,7 @@ export const orderConfirmTemplateToUser = async (
                       <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
                           <tr>
                               <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 36px; font-weight: 800; line-height: 48px;" class="mobile-center">
-                                  <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: #ffffff;">ZipKart</h1>
+                                  <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: #ffffff;">UrbanCart</h1>
                               </td>
                           </tr>
                       </table>
@@ -229,7 +229,7 @@ export const orderConfirmTemplateToUser = async (
                       <tr>
                           <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 24px; padding: 5px 0 10px 0;">
                               <p style="font-size: 14px; font-weight: 800; line-height: 18px; color: #333333;">
-                                ZipKart<br>1231 Street, Modal Gram<br>Ludhiana, Punjab-141002
+                                UrbanCart<br>1231 Street, Modal Gram<br>Ludhiana, Punjab-141002
                               </p>
                           </td>
                       </tr>
@@ -311,7 +311,7 @@ export const orderConfirmTemplateToAdmin = (
                       <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
                           <tr>
                               <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 36px; font-weight: 800; line-height: 48px;" class="mobile-center">
-                                  <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: #ffffff;">ZipKart</h1>
+                                  <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: #ffffff;">UrbanCart</h1>
                               </td>
                           </tr>
                       </table>
@@ -434,7 +434,7 @@ export const orderConfirmTemplateToAdmin = (
                         <tr>
                             <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 24px; padding: 5px 0 10px 0; border-top: 3px solid #eeeeee;">
                                 <p style="font-size: 14px; font-weight: 800; line-height: 18px; color: #333333;">
-                                    ZipKart<br>1231 Street, Modal Gram<br>Ludhiana, Punjab-141002
+                                    UrbanCart<br>1231 Street, Modal Gram<br>Ludhiana, Punjab-141002
                                 </p>
                             </td>
                         </tr>
