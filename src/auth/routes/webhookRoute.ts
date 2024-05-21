@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import Stripe from "stripe";
 
 import { envConfig } from "../../config/envConfig";
-import { updatePaymentIntent } from "../services/paymentServices";
+import { updatePaymentIntent } from "../controllers/paymentController";
 
 const endpointSecret = envConfig.Stripe_Web_Hook_Secret_Key;
 const secreteKey = envConfig.Stripe_Secret_key;
