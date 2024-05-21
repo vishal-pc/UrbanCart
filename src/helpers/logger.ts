@@ -28,6 +28,7 @@ const format = winston.format.combine(
 
 const transports = [
   new winston.transports.Console(),
+  // uncomment if want to save the log information
   // new winston.transports.File({
   //   filename: "logs/error.log",
   //   level: "error",
