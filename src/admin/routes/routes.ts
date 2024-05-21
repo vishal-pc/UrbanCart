@@ -1,7 +1,6 @@
 import express from "express";
 import { verifyAuthToken } from "../../middleware/token/authMiddleware";
 import multer from "multer";
-import bodyParser from "body-parser";
 import * as adminController from "../controller/adminContoller";
 import * as productController from "../controller/productController";
 import * as roleController from "../controller/roleController";
@@ -9,10 +8,6 @@ import * as categoryController from "../controller/categoryController";
 import * as subCategoryController from "../controller/subCategoryController";
 
 const adminRouter = express.Router();
-
-// Using body-parser middleware
-adminRouter.use(bodyParser.json());
-adminRouter.use(bodyParser.urlencoded({ extended: true }));
 
 // Configure multer for uploading files
 const storage = multer.diskStorage({

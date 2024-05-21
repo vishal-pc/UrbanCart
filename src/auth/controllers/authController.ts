@@ -113,6 +113,8 @@ export const getUserById = async (req: CustomRequest, res: Response) => {
       _id: foundedUser.id,
       fullName: foundedUser.fullName,
       email: foundedUser.email,
+      mobileNumber: foundedUser.mobileNumber || "null",
+      profileImg: foundedUser.profileImg || "null",
       role: foundedUser.role,
       createdAt: foundedUser.createdAt,
       updatedAt: foundedUser.updatedAt,

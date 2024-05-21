@@ -244,7 +244,12 @@ export const getProductById = async (req: Request, res: Response) => {
 export const updateProductById = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
-    const { updatedData } = req.body;
+    const {
+      productName,
+      productPrice,
+      productDescription,
+      productStockQuantity,
+    } = req.body;
     const file = req.file;
     const product = await Product.findById(productId);
 
@@ -262,13 +267,11 @@ export const updateProductById = async (req: Request, res: Response) => {
       product.productImg = secure_url;
     }
 
-    if (updatedData.productName) product.productName = updatedData.productName;
-    if (updatedData.productPrice)
-      product.productPrice = updatedData.productPrice;
-    if (updatedData.productDescription)
-      product.productDescription = updatedData.productDescription;
-    if (updatedData.productStockQuantity)
-      product.productStockQuantity = updatedData.productStockQuantity;
+    if (productName) product.productName = productName;
+    if (productPrice) product.productPrice = productPrice;
+    if (productDescription) product.productDescription = productDescription;
+    if (productStockQuantity)
+      product.productStockQuantity = productStockQuantity;
 
     const updatedProduct = await product.save();
 

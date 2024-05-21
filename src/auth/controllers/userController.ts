@@ -8,12 +8,13 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
-import { passwordRegex } from "../../helpers/helper";
+import { passwordRegex, validateMobileNumber } from "../../helpers/helper";
 import { sendMailForPassword } from "../../template/forgetPassMail";
 import Category from "../../admin/models/categoriesModel";
 import SubCategory from "../../admin/models/subCategoriesModels";
 import Product from "../../admin/models/productModel";
 import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
+import cloudinary from "../../middleware/cloudflare/cloudinary";
 
 const otpStore: any = {};
 
@@ -210,6 +211,68 @@ export const changePassword = async (req: CustomRequest, res: Response) => {
     }
   } catch (error) {
     console.error("Error in change password", error);
+    return res.json({
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    });
+  }
+};
+
+// update user profile
+export const updateUserProfile = async (req: CustomRequest, res: Response) => {
+  try {
+    const user = req.user as userType;
+    if (!user) {
+      return res.json({
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      });
+    }
+    const userId = user.userId;
+    const { fullName, mobileNumber } = req.body;
+    const file = req.file;
+
+    if (mobileNumber && !validateMobileNumber(mobileNumber)) {
+      return res.json({
+        message: ErrorMessages.InvalidMobileNumber,
+        status: StatusCodes.ClientError.BadRequest,
+        success: false,
+      });
+    }
+
+    const updateData: any = {};
+
+    if (file) {
+      const tempPath = file.path;
+      const uploadResult = await cloudinary.uploader.upload(tempPath);
+      const secure_url = uploadResult.secure_url;
+      updateData.profileImg = secure_url;
+    }
+
+    if (fullName) updateData.fullName = fullName;
+    if (mobileNumber) updateData.mobileNumber = mobileNumber;
+
+    const updatedUser = await Auth.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    });
+    if (updatedUser) {
+      return res.json({
+        message: SuccessMessages.UserUpdatedSuccess,
+        success: true,
+        status: StatusCodes.Success.Ok,
+        data: updatedUser,
+      });
+    } else {
+      return res.json({
+        message: ErrorMessages.ProfileUpdateError,
+        success: false,
+        status: StatusCodes.ServerError.InternalServerError,
+      });
+    }
+  } catch (error) {
+    console.error("Error in update user profile", error);
     return res.json({
       message: ErrorMessages.SomethingWentWrong,
       success: false,

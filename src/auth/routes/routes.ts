@@ -6,8 +6,20 @@ import * as paymentController from "../controllers/paymentController";
 import * as userController from "../controllers/userController";
 import * as pdfController from "../controllers/pdfController";
 import * as addressController from "../controllers/addressController";
+import multer from "multer";
 
 const authRouter = express.Router();
+
+// Configure multer for uploading files
+const storage = multer.diskStorage({
+  filename: (req, file, cb) => {
+    const name = Date.now() + "_" + file.originalname;
+    cb(null, name);
+  },
+});
+
+// Uploading files into storage
+const upload = multer({ storage: storage });
 
 // Auth routes
 authRouter.post("/register", authController.authRegister);
@@ -100,6 +112,12 @@ authRouter.patch(
   "/change-password",
   verifyAuthToken(["user", "admin"]),
   userController.changePassword
+);
+authRouter.patch(
+  "/update-profile",
+  verifyAuthToken(["user", "admin"]),
+  upload.single("profileImg"),
+  userController.updateUserProfile
 );
 authRouter.get(
   "/get-categories",

@@ -186,7 +186,17 @@ export const getUserAddressById = async (req: CustomRequest, res: Response) => {
 export const updateUserAddress = async (req: Request, res: Response) => {
   try {
     const { addressId } = req.params;
-    const { addressData } = req.body;
+    const {
+      mobileNumber,
+      country,
+      stateId,
+      stateName,
+      cityId,
+      cityName,
+      streetAddress,
+      nearByAddress,
+      areaPincode,
+    } = req.body;
     if (!addressId) {
       return res.json({
         message: ErrorMessages.AddressNotFound,
@@ -195,10 +205,7 @@ export const updateUserAddress = async (req: Request, res: Response) => {
       });
     }
 
-    if (
-      addressData.mobileNumber &&
-      !validateMobileNumber(addressData.mobileNumber)
-    ) {
+    if (mobileNumber && !validateMobileNumber(mobileNumber)) {
       return res.json({
         message: ErrorMessages.InvalidMobileNumber,
         status: StatusCodes.ClientError.BadRequest,
@@ -206,7 +213,7 @@ export const updateUserAddress = async (req: Request, res: Response) => {
       });
     }
 
-    if (addressData.areaPincode && !validatePinCode(addressData.areaPincode)) {
+    if (areaPincode && !validatePinCode(areaPincode)) {
       return res.json({
         message: ErrorMessages.InvalidPinCodeNumber,
         status: StatusCodes.ClientError.BadRequest,
@@ -215,19 +222,15 @@ export const updateUserAddress = async (req: Request, res: Response) => {
     }
 
     const updatedFields: any = {};
-    if (addressData.mobileNumber)
-      updatedFields.mobileNumber = addressData.mobileNumber;
-    if (addressData.country) updatedFields.country = addressData.country;
-    if (addressData.stateId) updatedFields.stateId = addressData.stateId;
-    if (addressData.stateName) updatedFields.stateName = addressData.stateName;
-    if (addressData.cityId) updatedFields.cityId = addressData.cityId;
-    if (addressData.cityName) updatedFields.cityName = addressData.cityName;
-    if (addressData.streetAddress)
-      updatedFields.streetAddress = addressData.streetAddress;
-    if (addressData.nearByAddress)
-      updatedFields.nearByAddress = addressData.nearByAddress;
-    if (addressData.areaPincode)
-      updatedFields.areaPincode = addressData.areaPincode;
+    if (mobileNumber) updatedFields.mobileNumber = mobileNumber;
+    if (country) updatedFields.country = country;
+    if (stateId) updatedFields.stateId = stateId;
+    if (stateName) updatedFields.stateName = stateName;
+    if (cityId) updatedFields.cityId = cityId;
+    if (cityName) updatedFields.cityName = cityName;
+    if (streetAddress) updatedFields.streetAddress = streetAddress;
+    if (nearByAddress) updatedFields.nearByAddress = nearByAddress;
+    if (areaPincode) updatedFields.areaPincode = areaPincode;
 
     const addressUpdated = await Address.findByIdAndUpdate(
       addressId,

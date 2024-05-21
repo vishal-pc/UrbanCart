@@ -169,7 +169,7 @@ export const getCategoryById = async (req: CustomRequest, res: Response) => {
 export const updateCategoryById = async (req: Request, res: Response) => {
   try {
     const { categoryId } = req.params;
-    const { updatedData } = req.body;
+    const { categoryName, categoryDescription } = req.body;
     const file = req.file;
     const category = await Category.findById(categoryId);
 
@@ -187,10 +187,8 @@ export const updateCategoryById = async (req: Request, res: Response) => {
       category.categoryImg = secure_url;
     }
 
-    if (updatedData.categoryName)
-      category.categoryName = updatedData.categoryName;
-    if (updatedData.categoryDescription)
-      category.categoryDescription = updatedData.categoryDescription;
+    if (categoryName) category.categoryName = categoryName;
+    if (categoryDescription) category.categoryDescription = categoryDescription;
 
     const updatedcategory = await category.save();
 

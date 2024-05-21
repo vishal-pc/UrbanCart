@@ -207,7 +207,7 @@ export const getSubcategoriesById = async (
 export const updateSubCategoryById = async (req: Request, res: Response) => {
   try {
     const { subCategoryId } = req.params;
-    const { updatedData } = req.body;
+    const { subCategoryName, subCategoryDescription } = req.body;
     const file = req.file;
     const subCategory = await SubCategory.findById(subCategoryId);
 
@@ -225,10 +225,9 @@ export const updateSubCategoryById = async (req: Request, res: Response) => {
       subCategory.subCategoryImg = secure_url;
     }
 
-    if (updatedData.subCategoryName)
-      subCategory.subCategoryName = updatedData.subCategoryName;
-    if (updatedData.subCategoryDescription)
-      subCategory.subCategoryDescription = updatedData.subCategoryDescription;
+    if (subCategoryName) subCategory.subCategoryName = subCategoryName;
+    if (subCategoryDescription)
+      subCategory.subCategoryDescription = subCategoryDescription;
 
     const updatedSubCategory = await subCategory.save();
 

@@ -46,6 +46,7 @@ export const SuccessMessages = {
     "Reset password OTP has been sent to your email address",
   ResetPasswordSuccess: "Password reset successfully",
   ChangePasswordSuccess: "Password changed successfully",
+  UserUpdatedSuccess: "User updated successfully",
   DataFound: "Data found",
   PdfInfo: "pdf info saved",
   AddressSuccess: "Address saved",
@@ -79,6 +80,7 @@ export const ErrorMessages = {
   SomethingWentWrong: "Something went wrong",
   RegisterError: "Error in register",
   LoginError: "Error in login",
+  ProfileUpdateError: "Error updating profile",
   MissingFields: (missingFieldsMessage: string) =>
     ` ${missingFieldsMessage} field is required`,
   FileUploadError: "No file uploaded",

@@ -7,6 +7,7 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
+import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
 
 // Register admin
 export const registerAdmin = async (req: Request, res: Response) => {
@@ -82,8 +83,17 @@ export const registerAdmin = async (req: Request, res: Response) => {
 };
 
 // Get all users
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (req: CustomRequest, res: Response) => {
   try {
+    const user = req.user as userType;
+    if (!user) {
+      return res.json({
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      });
+    }
+    const userId = user.userId;
     const users = await Auth.find().populate("role", "role");
     if (!users) {
       return res.json({
@@ -92,10 +102,15 @@ export const getAllUsers = async (req: Request, res: Response) => {
         status: StatusCodes.ClientError.NotFound,
       });
     }
-    const userData = users.map((user: IAuth) => ({
+    const filteredUsers = users.filter(
+      (u: IAuth) => u._id.toString() !== userId
+    );
+    const userData = filteredUsers.map((user: IAuth) => ({
       _id: user._id,
       fullName: user.fullName,
       email: user.email,
+      mobileNumber: user.mobileNumber || "null",
+      profileImg: user.profileImg || "null",
       role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
