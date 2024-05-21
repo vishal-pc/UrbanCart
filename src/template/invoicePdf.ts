@@ -149,7 +149,7 @@ export const downloadPdf = async (
           </div>
           <div class="billing-informations">
             <h2>From</h2>
-            <p>ZipKart</p>
+            <p>UrbanCart</p>
             <p>1231 Street, Modal Gram</p>
             <p>Ludhiana, Punjab-141002</p>
           </div>
