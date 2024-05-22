@@ -101,8 +101,7 @@ export const getAllCategories = async (req: CustomRequest, res: Response) => {
         status: StatusCodes.ClientError.NotFound,
       });
     }
-    const userId = user.userId;
-    const categories = await Category.find({ createdBy: userId });
+    const categories = await Category.find();
     if (categories.length > 0) {
       return res.json({
         status: StatusCodes.Success.Ok,

@@ -30,6 +30,16 @@ adminRouter.get(
   verifyAuthToken(["admin"]),
   adminController.getAllUsers
 );
+adminRouter.get(
+  "/get-all-payments",
+  verifyAuthToken(["admin"]),
+  adminController.getTotalOrderDetails
+);
+adminRouter.get(
+  "/get-total-revenue",
+  verifyAuthToken(["admin"]),
+  adminController.getTotalNumberOfOrderPaymentsDetails
+);
 
 // Categories routes
 adminRouter.post(
