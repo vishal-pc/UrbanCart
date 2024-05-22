@@ -1,0 +1,17 @@
+version: "3"
+services:
+  urbancart:
+    container_name: urbancart-docker-app
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    network_mode: bridge
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+# 1 Run compose file for build :- docker-compose up --build -d
+# 2 Stop compose file :- docker-compose down
