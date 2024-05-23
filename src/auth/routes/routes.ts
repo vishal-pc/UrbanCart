@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "multer";
 import { verifyAuthToken } from "../../middleware/token/authMiddleware";
 import * as authController from "../controllers/authController";
 import * as cartController from "../controllers/cartController";
@@ -6,7 +7,7 @@ import * as paymentController from "../controllers/paymentController";
 import * as userController from "../controllers/userController";
 import * as pdfController from "../controllers/pdfController";
 import * as addressController from "../controllers/addressController";
-import multer from "multer";
+import * as wishlistController from "../controllers/wishlistController";
 
 const authRouter = express.Router();
 
@@ -119,19 +120,13 @@ authRouter.patch(
   upload.single("profileImg"),
   userController.updateUserProfile
 );
-authRouter.get(
-  "/get-categories",
-  verifyAuthToken(["user"]),
-  userController.getCategories
-);
+authRouter.get("/get-categories", userController.getCategories);
 authRouter.get(
   "/get-categories/:categoryId",
-  verifyAuthToken(["user"]),
   userController.getCategoriesByIdWithSubCategories
 );
 authRouter.get(
   "/get-sub-categories/:subcategoryId",
-  verifyAuthToken(["user"]),
   userController.getSubCategoriesByIdWithProducts
 );
 
@@ -140,6 +135,23 @@ authRouter.get(
   "/download-pdf/:paymentId",
   verifyAuthToken(["user"]),
   pdfController.downloadPdfInvoice
+);
+
+// Wishlist routes
+authRouter.post(
+  "/add-to-wishlist",
+  verifyAuthToken(["user"]),
+  wishlistController.addToWishlist
+);
+authRouter.get(
+  "/get-user-wishlist",
+  verifyAuthToken(["user"]),
+  wishlistController.getUserWishlist
+);
+authRouter.delete(
+  "/remove-wishlist/:wishlistId",
+  verifyAuthToken(["user"]),
+  wishlistController.deleteUserWishlist
 );
 
 export default authRouter;

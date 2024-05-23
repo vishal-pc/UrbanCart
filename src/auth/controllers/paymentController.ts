@@ -394,7 +394,10 @@ export const getPaymentDetails = async (req: CustomRequest, res: Response) => {
     }
     const userId = user.userId;
 
-    const payments = await Payment.find({ buyerUserId: userId });
+    const payments = await Payment.find({
+      buyerUserId: userId,
+      paymentStatus: "Completed",
+    });
 
     if (!payments || payments.length === 0) {
       return res.json({

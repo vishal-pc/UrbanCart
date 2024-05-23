@@ -336,6 +336,7 @@ export const getCategoriesByIdWithSubCategories = async (
               _id: subCategory._id,
               subCategoryName: subCategory?.subCategoryName,
               subCategoryDescription: subCategory?.subCategoryDescription,
+              subCategoryImg: subCategory?.subCategoryImg,
               createdAt: subCategory?.createdAt,
               updatedAt: subCategory?.updatedAt,
             })),
