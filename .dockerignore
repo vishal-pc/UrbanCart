@@ -2,7 +2,6 @@
 **/node_modules/
 .env
 .git
+.github
 logs/*
-dist/
-dist
-redis_data/
+dist/*

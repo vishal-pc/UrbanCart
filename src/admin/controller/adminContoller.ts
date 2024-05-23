@@ -239,12 +239,17 @@ export const getTotalOrderDetails = async (req: Request, res: Response) => {
       updatedAt: payment?.updatedAt,
     }));
 
+    const totalByProductCount = paymentData
+      .filter((payment) => payment.paymentStatus === "Completed")
+      .reduce((count, payment) => count + payment.totalProduct.length, 0);
+
     if (allPayments.length > 0) {
       return res.json({
         message: SuccessMessages.PaymentFoundSuccess,
         status: StatusCodes.Success.Ok,
         success: true,
         totalPaymentCount: totalCount,
+        totalByproductCount: totalByProductCount,
         successPaymentCount: completedCount,
         pendingPaymentCount: pendingCount,
         payments: paymentData,

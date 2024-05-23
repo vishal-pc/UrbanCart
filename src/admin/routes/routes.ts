@@ -106,16 +106,8 @@ adminRouter.post(
   upload.single("productImg"),
   productController.createProduct
 );
-adminRouter.get(
-  "/get-all-products",
-  verifyAuthToken(["admin", "user"]),
-  productController.getAllProducts
-);
-adminRouter.get(
-  "/get-product/:productId",
-  verifyAuthToken(["admin", "user"]),
-  productController.getProductById
-);
+adminRouter.get("/get-all-products", productController.getAllProducts);
+adminRouter.get("/get-product/:productId", productController.getProductById);
 adminRouter.patch(
   "/update-product/:productId",
   verifyAuthToken(["admin"]),

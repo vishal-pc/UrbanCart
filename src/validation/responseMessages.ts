@@ -53,6 +53,9 @@ export const SuccessMessages = {
   AddressFound: "Address found",
   AddressUpdated: "Address updated",
   AddressDelete: "Address deleted",
+  WishlistSuccess: "Wishlist saved",
+  WishlistFound: "Wishlist found",
+  WishlistDelete: "Wishlist removed",
 };
 
 export const ErrorMessages = {
@@ -109,4 +112,8 @@ export const ErrorMessages = {
   DataError: "Data not found",
   AddressError: "Error in creating address",
   AddressNotFound: "Address not found",
+  WishlistNotFound: "Wishlist not found",
+  WishlistAddError: "Error in creating wishlist",
+  WishlistRemoveError: "Error in deleting wishlist",
+  WishlistAlreadyExist: "This product already in you wishlist",
 };
