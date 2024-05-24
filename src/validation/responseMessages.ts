@@ -56,6 +56,8 @@ export const SuccessMessages = {
   WishlistSuccess: "Wishlist saved",
   WishlistFound: "Wishlist found",
   WishlistDelete: "Wishlist removed",
+  ReviewSuccess: "Review added successfully",
+  ReviewFound: "Review found",
 };
 
 export const ErrorMessages = {
@@ -116,4 +118,7 @@ export const ErrorMessages = {
   WishlistAddError: "Error in creating wishlist",
   WishlistRemoveError: "Error in deleting wishlist",
   WishlistAlreadyExist: "This product already in you wishlist",
+  ReviewNotFound: "Review not found",
+  ReviewAddError: "Review not added",
+  UserNotEligibleForReview: "You haven't purchase this product",
 };

@@ -30,8 +30,11 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
     productPrice,
     productDescription,
     productStockQuantity,
+    productBrand,
+    productShortDescription,
+    productFeature,
   } = req.body;
-  const file = req.file;
+  const files = req.files as Express.Multer.File[];
   try {
     const requiredFields = [
       "categoryName",
@@ -40,6 +43,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
       "productPrice",
       "productDescription",
       "productStockQuantity",
+      "productFeature",
+      "productBrand",
+      "productShortDescription",
     ];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
 
@@ -51,16 +57,19 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
         status: StatusCodes.ClientError.BadRequest,
       });
     }
-    if (!file) {
+    if (!files || files.length === 0) {
       return res.json({
         message: ErrorMessages.FileUploadError,
         success: false,
         status: StatusCodes.ClientError.NotFound,
       });
     }
-    const tempPath = file?.path;
-    const uploadResult = await cloudinary.uploader.upload(tempPath);
-    const secure_url = uploadResult.secure_url;
+
+    const uploadPromises = files.map((file) =>
+      cloudinary.uploader.upload(file.path)
+    );
+    const uploadResults = await Promise.all(uploadPromises);
+    const secure_urls = uploadResults.map((result) => result.secure_url);
 
     const foundCategory: ICategories | null = await Category.findOne({
       categoryName: categoryName,
@@ -89,7 +98,10 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
       productPrice,
       productDescription,
       productStockQuantity,
-      productImg: secure_url,
+      productBrand,
+      productShortDescription,
+      productFeature,
+      productImg: secure_urls,
       createdBy: foundUser,
     };
 
@@ -106,6 +118,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
           productDescription: productSaved.productDescription,
           productImg: productSaved.productImg,
           productStockQuantity: productSaved.productStockQuantity,
+          productBrand: productSaved.productBrand,
+          productShortDescription: productSaved.productShortDescription,
+          productFeature: productSaved.productFeature,
           categoryId: {
             _id: foundCategory._id,
             categoryName: foundCategory.categoryName,
@@ -173,6 +188,13 @@ export const getAllProducts = async (req: Request, res: Response) => {
       filter.$or = [
         { productName: { $regex: `^${searchQuery}$`, $options: "i" } },
         { productDescription: { $regex: `^${searchQuery}$`, $options: "i" } },
+        { productBrand: { $regex: `^${searchQuery}$`, $options: "i" } },
+        {
+          productShortDescription: {
+            $regex: `^${searchQuery}$`,
+            $options: "i",
+          },
+        },
         { categoryId: { $in: categoryIds } },
         { subCategoryId: { $in: subCategoryIds } },
       ];
@@ -249,8 +271,11 @@ export const updateProductById = async (req: Request, res: Response) => {
       productPrice,
       productDescription,
       productStockQuantity,
+      productBrand,
+      productShortDescription,
+      productFeature,
     } = req.body;
-    const file = req.file;
+    const files = req.files as Express.Multer.File[];
     const product = await Product.findById(productId);
 
     if (!product) {
@@ -260,11 +285,13 @@ export const updateProductById = async (req: Request, res: Response) => {
         status: StatusCodes.ClientError.NotFound,
       });
     }
-    if (file) {
-      const tempPath = file.path;
-      const uploadResult = await cloudinary.uploader.upload(tempPath);
-      const secure_url = uploadResult.secure_url;
-      product.productImg = secure_url;
+    if (files && files.length > 0) {
+      const uploadPromises = files.map((file) =>
+        cloudinary.uploader.upload(file.path)
+      );
+      const uploadResults = await Promise.all(uploadPromises);
+      const secure_urls = uploadResults.map((result) => result.secure_url);
+      product.productImg = secure_urls;
     }
 
     if (productName) product.productName = productName;
@@ -272,6 +299,10 @@ export const updateProductById = async (req: Request, res: Response) => {
     if (productDescription) product.productDescription = productDescription;
     if (productStockQuantity)
       product.productStockQuantity = productStockQuantity;
+    if (productBrand) product.productBrand = productBrand;
+    if (productShortDescription)
+      product.productShortDescription = productShortDescription;
+    if (productFeature) product.productFeature = productFeature;
 
     const updatedProduct = await product.save();
 

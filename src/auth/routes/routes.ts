@@ -8,6 +8,7 @@ import * as userController from "../controllers/userController";
 import * as pdfController from "../controllers/pdfController";
 import * as addressController from "../controllers/addressController";
 import * as wishlistController from "../controllers/wishlistController";
+import * as reviewController from "../controllers/reviewController";
 
 const authRouter = express.Router();
 
@@ -97,7 +98,7 @@ authRouter.post(
 );
 authRouter.get(
   "/get-payment/:paymentId",
-  verifyAuthToken(["user"]),
+  verifyAuthToken(["user", "admin"]),
   paymentController.getPaymentById
 );
 authRouter.get(
@@ -152,6 +153,24 @@ authRouter.delete(
   "/remove-wishlist/:wishlistId",
   verifyAuthToken(["user"]),
   wishlistController.deleteUserWishlist
+);
+
+// Review routes
+authRouter.post(
+  "/submit-review",
+  verifyAuthToken(["user"]),
+  upload.array("productImg", 5),
+  reviewController.productReview
+);
+authRouter.get(
+  "/get-all-reviews",
+  verifyAuthToken(["user"]),
+  reviewController.getAllProductReviews
+);
+authRouter.get(
+  "/get-review/:productId",
+  verifyAuthToken(["user"]),
+  reviewController.checkReviewForSubmit
 );
 
 export default authRouter;
