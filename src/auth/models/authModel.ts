@@ -6,6 +6,7 @@ export interface IAuth extends Document {
   password: string;
   mobileNumber: number;
   profileImg: string;
+  address: string;
   IsAdmin: boolean;
   role: Schema.Types.ObjectId;
   stripeUserId: string;
@@ -28,6 +29,9 @@ const authSchema = new mongoose.Schema(
       type: Number,
     },
     profileImg: {
+      type: String,
+    },
+    address: {
       type: String,
     },
     role: { type: Schema.Types.ObjectId, ref: "Role", required: false },

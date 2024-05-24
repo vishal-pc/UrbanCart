@@ -103,7 +103,7 @@ adminRouter.delete(
 adminRouter.post(
   "/create-product",
   verifyAuthToken(["admin"]),
-  upload.single("productImg"),
+  upload.array("productImg", 5),
   productController.createProduct
 );
 adminRouter.get("/get-all-products", productController.getAllProducts);
@@ -111,7 +111,7 @@ adminRouter.get("/get-product/:productId", productController.getProductById);
 adminRouter.patch(
   "/update-product/:productId",
   verifyAuthToken(["admin"]),
-  upload.single("productImg"),
+  upload.array("productImg", 5),
   productController.updateProductById
 );
 adminRouter.delete(

@@ -231,7 +231,7 @@ export const updateUserProfile = async (req: CustomRequest, res: Response) => {
       });
     }
     const userId = user.userId;
-    const { fullName, mobileNumber } = req.body;
+    const { fullName, mobileNumber, address } = req.body;
     const file = req.file;
 
     if (mobileNumber && !validateMobileNumber(mobileNumber)) {
@@ -253,6 +253,7 @@ export const updateUserProfile = async (req: CustomRequest, res: Response) => {
 
     if (fullName) updateData.fullName = fullName;
     if (mobileNumber) updateData.mobileNumber = mobileNumber;
+    if (address) updateData.address = address;
 
     const updatedUser = await Auth.findByIdAndUpdate(userId, updateData, {
       new: true,

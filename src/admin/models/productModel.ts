@@ -5,9 +5,12 @@ export interface IProduct extends Document {
   categoryId: Schema.Types.ObjectId;
   subCategoryId: Schema.Types.ObjectId;
   productName: string;
+  productBrand: string;
   productPrice: number;
-  productImg: string;
+  productImg?: string[];
+  productShortDescription: string;
   productDescription: string;
+  productFeature: string;
   productStockQuantity: number;
   createdBy: Schema.Types.ObjectId;
   createdAt: Date;
@@ -29,10 +32,14 @@ const productSchema = new mongoose.Schema(
     productName: {
       type: String,
     },
+    productBrand: {
+      type: String,
+    },
     productPrice: {
       type: Number,
     },
-    productImg: {
+    productImg: [{ type: String, required: false }],
+    productShortDescription: {
       type: String,
     },
     productDescription: {
@@ -40,6 +47,9 @@ const productSchema = new mongoose.Schema(
     },
     productStockQuantity: {
       type: Number,
+    },
+    productFeature: {
+      type: String,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
