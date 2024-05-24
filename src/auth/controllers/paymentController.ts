@@ -69,7 +69,9 @@ export const processPayment = async (req: CustomRequest, res: Response) => {
         const productDetails = await Product.findById(item.productId);
         return {
           ...item,
-          productImageUrl: productDetails?.productImg || "",
+          productImageUrl: productDetails?.productImg
+            ? productDetails.productImg[0]
+            : "",
         };
       })
     );

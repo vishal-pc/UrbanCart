@@ -30,9 +30,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
     productPrice,
     productDescription,
     productStockQuantity,
-    productBrand,
-    productShortDescription,
-    productFeature,
+    // productBrand,
+    // productShortDescription,
+    // productFeature,
   } = req.body;
   const files = req.files as Express.Multer.File[];
   try {
@@ -43,9 +43,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
       "productPrice",
       "productDescription",
       "productStockQuantity",
-      "productFeature",
-      "productBrand",
-      "productShortDescription",
+      // "productFeature",
+      // "productBrand",
+      // "productShortDescription",
     ];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
 
@@ -98,9 +98,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
       productPrice,
       productDescription,
       productStockQuantity,
-      productBrand,
-      productShortDescription,
-      productFeature,
+      // productBrand,
+      // productShortDescription,
+      // productFeature,
       productImg: secure_urls,
       createdBy: foundUser,
     };
@@ -118,9 +118,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
           productDescription: productSaved.productDescription,
           productImg: productSaved.productImg,
           productStockQuantity: productSaved.productStockQuantity,
-          productBrand: productSaved.productBrand,
-          productShortDescription: productSaved.productShortDescription,
-          productFeature: productSaved.productFeature,
+          // productBrand: productSaved.productBrand,
+          // productShortDescription: productSaved.productShortDescription,
+          // productFeature: productSaved.productFeature,
           categoryId: {
             _id: foundCategory._id,
             categoryName: foundCategory.categoryName,
