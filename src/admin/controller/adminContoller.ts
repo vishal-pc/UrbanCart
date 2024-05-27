@@ -309,10 +309,11 @@ export const getTotalNumberOfOrderPaymentsDetails = async (
         },
         {
           $sort: {
-            "_id.year": 1,
-            "_id.month": 1,
+            "_id.year": -1,
+            "_id.month": -1,
           },
         },
+        { $limit: 12 },
       ]);
 
       // Format the monthlyRevenue

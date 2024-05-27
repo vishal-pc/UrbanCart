@@ -1,17 +1,17 @@
 // Get all the months name
 const monthNames = [
-  "January",
-  "February",
-  "March",
-  "April",
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
   "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "JUNE",
+  "JULY",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
 ];
 
 export const getMonthName = (monthNumber: number): string => {

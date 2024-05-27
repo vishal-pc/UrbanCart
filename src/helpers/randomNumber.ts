@@ -9,3 +9,35 @@ export const generateRandomNumber = () => {
   }
   return randomNumber;
 };
+
+// Search random query function
+export const parseSearchQuery = (query: string) => {
+  const result: any = {
+    keywords: [],
+    priceRange: null,
+    attributes: [],
+  };
+
+  // Extract price range
+  const priceRegex = /under (\d+)/i;
+  const priceMatch = query.match(priceRegex);
+
+  if (priceMatch) {
+    result.priceRange = { max: Number(priceMatch[1]) };
+    query = query.replace(priceMatch[0], "").trim();
+  }
+
+  // Extract attributes like "for men"
+  const attributeRegex = /for\s+(\w+)/i;
+  const attributeMatch = query.match(attributeRegex);
+
+  if (attributeMatch) {
+    result.attributes.push(attributeMatch[1].toLowerCase());
+    query = query.replace(attributeMatch[0], "").trim();
+  }
+
+  // Extract remaining keywords
+  result.keywords = query.split(/\s+/).map((word) => word.trim().toLowerCase());
+
+  return result;
+};

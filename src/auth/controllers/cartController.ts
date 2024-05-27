@@ -37,50 +37,21 @@ export const addToCart = async (req: CustomRequest, res: Response) => {
       });
     }
 
-    const existingCartItem = await Cart.findOne({
-      buyerUserId: foundUser,
-      productId: product._id,
-    });
-    if (existingCartItem) {
-      // Increase the quantity of the existing cart item
-      existingCartItem.quantity += 1;
-      const updatedCartItem = await existingCartItem.save();
-      return res.json({
-        message: SuccessMessages.CartAlreadySuccess,
-        success: true,
-        status: StatusCodes.Success.Ok,
-        data: {
-          _id: updatedCartItem._id,
-          buyerUserId: {
-            fullName: foundUser?.fullName,
-            email: foundUser?.email,
-          },
-          productId: {
-            _id: product?._id,
-            productName: product?.productName,
-            productPrice: product?.productPrice,
-            productDescription: product?.productDescription,
-            productImg: product?.productImg,
-          },
-          quantity: updatedCartItem.quantity,
-          createdAt: updatedCartItem.createdAt,
-          updatedAt: updatedCartItem.updatedAt,
-        },
-      });
-    } else {
-      const newCartItem = new Cart({
+    if (foundUser?.userLogin === true) {
+      const existingCartItem = await Cart.findOne({
         buyerUserId: foundUser,
         productId: product._id,
-        quantity: 1,
       });
-      const savedCartItem = await newCartItem.save();
-      if (savedCartItem) {
+      if (existingCartItem) {
+        // Increase the quantity of the existing cart item
+        existingCartItem.quantity += 1;
+        const updatedCartItem = await existingCartItem.save();
         return res.json({
-          message: SuccessMessages.CartSuccess,
+          message: SuccessMessages.CartAlreadySuccess,
           success: true,
-          status: StatusCodes.Success.Created,
+          status: StatusCodes.Success.Ok,
           data: {
-            _id: savedCartItem._id,
+            _id: updatedCartItem._id,
             buyerUserId: {
               fullName: foundUser?.fullName,
               email: foundUser?.email,
@@ -92,18 +63,55 @@ export const addToCart = async (req: CustomRequest, res: Response) => {
               productDescription: product?.productDescription,
               productImg: product?.productImg,
             },
-            quantity: savedCartItem.quantity,
-            createdAt: savedCartItem.createdAt,
-            updatedAt: savedCartItem.updatedAt,
+            quantity: updatedCartItem.quantity,
+            createdAt: updatedCartItem.createdAt,
+            updatedAt: updatedCartItem.updatedAt,
           },
         });
       } else {
-        return res.json({
-          message: ErrorMessages.CartError,
-          success: false,
-          status: StatusCodes.ClientError.NotFound,
+        const newCartItem = new Cart({
+          buyerUserId: foundUser,
+          productId: product._id,
+          quantity: 1,
         });
+        const savedCartItem = await newCartItem.save();
+        if (savedCartItem) {
+          return res.json({
+            message: SuccessMessages.CartSuccess,
+            success: true,
+            status: StatusCodes.Success.Created,
+            data: {
+              _id: savedCartItem._id,
+              buyerUserId: {
+                fullName: foundUser?.fullName,
+                email: foundUser?.email,
+              },
+              productId: {
+                _id: product?._id,
+                productName: product?.productName,
+                productPrice: product?.productPrice,
+                productDescription: product?.productDescription,
+                productImg: product?.productImg,
+              },
+              quantity: savedCartItem.quantity,
+              createdAt: savedCartItem.createdAt,
+              updatedAt: savedCartItem.updatedAt,
+            },
+          });
+        } else {
+          return res.json({
+            message: ErrorMessages.CartError,
+            success: false,
+            status: StatusCodes.ClientError.NotFound,
+          });
+        }
       }
+    } else {
+      return res.json({
+        message: ErrorMessages.UserLoginCheck,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      });
     }
   } catch (error) {
     console.error("Error in creating cart", error);

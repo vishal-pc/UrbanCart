@@ -21,6 +21,7 @@ export const SuccessMessages = {
   SampelResponse: "Hello from Node js",
   RegisterSuccess: "Registration successful",
   SignInSuccess: "Sign-in successful",
+  SignOutSuccess: "Sign-out successful",
   CategoriesSuccess: "Categorie created successfully",
   CategoriesFoundSuccess: "Categories found successfully",
   CategoriesDelete: "Categories delete successfully",
@@ -121,4 +122,6 @@ export const ErrorMessages = {
   ReviewNotFound: "Review not found",
   ReviewAddError: "Review not added",
   UserNotEligibleForReview: "You haven't purchase this product",
+  UserLoginCheck: "Please login first to add or by this product",
+  UserLoginRequire: "Please login first",
 };
