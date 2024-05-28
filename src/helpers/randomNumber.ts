@@ -18,7 +18,6 @@ export const parseSearchQuery = (query: string) => {
     attributes: [],
   };
 
-  // Extract price range
   const priceRegex = /under (\d+)/i;
   const priceMatch = query.match(priceRegex);
 
@@ -27,7 +26,6 @@ export const parseSearchQuery = (query: string) => {
     query = query.replace(priceMatch[0], "").trim();
   }
 
-  // Extract attributes like "for men"
   const attributeRegex = /for\s+(\w+)/i;
   const attributeMatch = query.match(attributeRegex);
 
@@ -36,7 +34,6 @@ export const parseSearchQuery = (query: string) => {
     query = query.replace(attributeMatch[0], "").trim();
   }
 
-  // Extract remaining keywords
   result.keywords = query.split(/\s+/).map((word) => word.trim().toLowerCase());
 
   return result;

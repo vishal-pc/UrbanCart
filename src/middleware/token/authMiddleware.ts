@@ -18,10 +18,6 @@ export interface userType {
   };
 }
 
-interface IUserLogin {
-  userLogin: boolean;
-}
-
 export const verifyAuthToken =
   (allowedRoles: string[]) =>
   async (req: CustomRequest, res: Response, next: NextFunction) => {

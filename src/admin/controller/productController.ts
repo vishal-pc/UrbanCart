@@ -196,22 +196,39 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
         categoryIds = await Category.find({
           $or: [
-            { categoryName: { $regex: keywordRegex, $options: "i" } },
-            { categoryDescription: { $regex: keywordRegex, $options: "i" } },
+            { categoryName: { $regex: `^${keywordRegex}`, $options: "i" } },
+            {
+              categoryDescription: {
+                $regex: `^${keywordRegex}`,
+                $options: "i",
+              },
+            },
           ],
         }).distinct("_id");
 
         subCategoryIds = await SubCategory.find({
           $or: [
-            { subCategoryName: { $regex: keywordRegex, $options: "i" } },
-            { subCategoryDescription: { $regex: keywordRegex, $options: "i" } },
+            { subCategoryName: { $regex: `^${keywordRegex}`, $options: "i" } },
+            {
+              subCategoryDescription: {
+                $regex: `^${keywordRegex}`,
+                $options: "i",
+              },
+            },
           ],
         }).distinct("_id");
 
         filter.$or = [
-          { productDescription: { $regex: keywordRegex, $options: "i" } },
-          { productBrand: { $regex: keywordRegex, $options: "i" } },
-          { productShortDescription: { $regex: keywordRegex, $options: "i" } },
+          { productName: { $regex: `^${keywordRegex}`, $options: "i" } },
+          { productDescription: { $regex: `^${keywordRegex}`, $options: "i" } },
+          { productBrand: { $regex: `^${keywordRegex}`, $options: "i" } },
+          {
+            productShortDescription: {
+              $regex: `^${keywordRegex}`,
+              $options: "i",
+            },
+          },
+          { productFeature: { $regex: `^${keywordRegex}`, $options: "i" } },
           { categoryId: { $in: categoryIds } },
           { subCategoryId: { $in: subCategoryIds } },
         ];
@@ -224,7 +241,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
           filter.$and = [];
         }
         filter.$and.push({
-          productName: { $regex: productKeywordRegex, $options: "i" },
+          productName: { $regex: `^${productKeywordRegex}`, $options: "i" },
         });
       }
 
@@ -253,7 +270,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     if (allProducts.length > 0) {
       return res.json({
         message: SuccessMessages.ProductFoundSuccess,
-        status: 200,
+        status: StatusCodes.Success.Ok,
         success: true,
         data: {
           products: allProducts,
@@ -264,7 +281,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
       return res.json({
         message: ErrorMessages.ProductNotFound,
         success: false,
-        status: 400,
+        status: StatusCodes.ClientError.NotFound,
       });
     }
   } catch (error) {
@@ -272,7 +289,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     return res.json({
       message: ErrorMessages.SomethingWentWrong,
       success: false,
-      status: 500,
+      status: StatusCodes.ServerError.InternalServerError,
     });
   }
 };

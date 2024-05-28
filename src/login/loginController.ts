@@ -78,29 +78,33 @@ export const authLogout = async (req: CustomRequest, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {
-      return res.status(StatusCodes.ClientError.NotFound).json({
+      return {
         message: ErrorMessages.UserNotFound,
         success: false,
-      });
+        status: StatusCodes.ClientError.NotFound,
+      };
     }
     const userId = user.userId;
 
     // Update the user's login status to false
-    await Auth.findByIdAndUpdate(
+    const userlogout = await Auth.findByIdAndUpdate(
       { _id: userId },
-      { $set: { userLogin: false } }
+      { $set: { userLogin: false } },
+      { new: true }
     );
 
     return res.json({
       message: SuccessMessages.SignOutSuccess,
       status: StatusCodes.Success.Ok,
       success: true,
+      userlogout: userlogout?.userLogin,
     });
   } catch (error) {
     console.error("Error in user logout", error);
-    return res.status(StatusCodes.ServerError.InternalServerError).json({
+    return res.json({
       message: ErrorMessages.SomethingWentWrong,
       success: false,
+      status: StatusCodes.ServerError.InternalServerError,
     });
   }
 };
