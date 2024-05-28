@@ -8,6 +8,7 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../validation/responseMessages";
+import { CustomRequest, userType } from "../middleware/token/authMiddleware";
 
 // User Login
 export const authLogin = async (req: Request, res: Response) => {
@@ -41,13 +42,16 @@ export const authLogin = async (req: Request, res: Response) => {
         status: StatusCodes.ClientError.BadRequest,
       });
     }
+    await Auth.findByIdAndUpdate(auth._id, { userLogin: true }, { new: true });
+    const updatedAuth = await Auth.findById(auth._id).populate("role", "role");
 
     const token = jwt.sign(
       {
-        userId: auth._id,
-        fullName: auth.fullName,
-        email: auth.email,
-        role: auth.role,
+        userId: updatedAuth?._id,
+        fullName: updatedAuth?.fullName,
+        email: updatedAuth?.email,
+        role: updatedAuth?.role,
+        userLogin: updatedAuth?.userLogin,
       },
       envConfig.Jwt_Secret,
       { expiresIn: envConfig.Jwt_Expiry_Hours }
@@ -61,6 +65,42 @@ export const authLogin = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error in user login", error);
+    return res.json({
+      message: ErrorMessages.SomethingWentWrong,
+      success: false,
+      status: StatusCodes.ServerError.InternalServerError,
+    });
+  }
+};
+
+// logout api
+export const authLogout = async (req: CustomRequest, res: Response) => {
+  try {
+    const user = req.user as userType;
+    if (!user) {
+      return {
+        message: ErrorMessages.UserNotFound,
+        success: false,
+        status: StatusCodes.ClientError.NotFound,
+      };
+    }
+    const userId = user.userId;
+
+    // Update the user's login status to false
+    const userlogout = await Auth.findByIdAndUpdate(
+      { _id: userId },
+      { $set: { userLogin: false } },
+      { new: true }
+    );
+
+    return res.json({
+      message: SuccessMessages.SignOutSuccess,
+      status: StatusCodes.Success.Ok,
+      success: true,
+      userlogout: userlogout?.userLogin,
+    });
+  } catch (error) {
+    console.error("Error in user logout", error);
     return res.json({
       message: ErrorMessages.SomethingWentWrong,
       success: false,

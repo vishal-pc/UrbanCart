@@ -10,6 +10,7 @@ import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
 import Auth from "../../auth/models/authModel";
 import Category, { ICategories } from "../models/categoriesModel";
 import SubCategory, { ISubcategory } from "../models/subCategoriesModels";
+import { parseSearchQuery } from "../../helpers/randomNumber";
 
 // Create a new product
 export const createProduct = async (req: CustomRequest, res: Response) => {
@@ -30,9 +31,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
     productPrice,
     productDescription,
     productStockQuantity,
-    // productBrand,
-    // productShortDescription,
-    // productFeature,
+    productBrand,
+    productShortDescription,
+    productFeature,
   } = req.body;
   const files = req.files as Express.Multer.File[];
   try {
@@ -43,9 +44,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
       "productPrice",
       "productDescription",
       "productStockQuantity",
-      // "productFeature",
-      // "productBrand",
-      // "productShortDescription",
+      "productFeature",
+      "productBrand",
+      "productShortDescription",
     ];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
 
@@ -98,9 +99,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
       productPrice,
       productDescription,
       productStockQuantity,
-      // productBrand,
-      // productShortDescription,
-      // productFeature,
+      productBrand,
+      productShortDescription,
+      productFeature,
       productImg: secure_urls,
       createdBy: foundUser,
     };
@@ -118,9 +119,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
           productDescription: productSaved.productDescription,
           productImg: productSaved.productImg,
           productStockQuantity: productSaved.productStockQuantity,
-          // productBrand: productSaved.productBrand,
-          // productShortDescription: productSaved.productShortDescription,
-          // productFeature: productSaved.productFeature,
+          productBrand: productSaved.productBrand,
+          productShortDescription: productSaved.productShortDescription,
+          productFeature: productSaved.productFeature,
           categoryId: {
             _id: foundCategory._id,
             categoryName: foundCategory.categoryName,
@@ -160,68 +161,127 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
 // Get all products
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
-    const { searchQuery, page, limit } = req.query;
+    const { searchQuery } = req.query;
     let filter: any = {};
 
-    if (searchQuery) {
-      const categoryIds = await Category.find({
-        $or: [
-          { categoryName: { $regex: `^${searchQuery}$`, $options: "i" } },
-          {
-            categoryDescription: { $regex: `^${searchQuery}$`, $options: "i" },
-          },
-        ],
-      }).distinct("_id");
+    const distinctProductNames = await Product.distinct("productName");
+    const distinctCategoryNames = await Category.distinct("categoryName");
+    const distinctSubCategoryNames = await SubCategory.distinct(
+      "subCategoryName"
+    );
 
-      const subCategoryIds = await SubCategory.find({
-        $or: [
-          { subCategoryName: { $regex: `^${searchQuery}$`, $options: "i" } },
+    if (searchQuery) {
+      const parsedQuery = parseSearchQuery(searchQuery as string);
+      const { keywords, priceRange, attributes } = parsedQuery;
+
+      let categoryIds: string[] = [];
+      let subCategoryIds: string[] = [];
+      let productKeywords: string[] = [];
+      let otherKeywords: string[] = [];
+
+      keywords.forEach((keyword: any) => {
+        if (
+          distinctProductNames.includes(keyword) ||
+          distinctCategoryNames.includes(keyword) ||
+          distinctSubCategoryNames.includes(keyword)
+        ) {
+          productKeywords.push(keyword);
+        } else {
+          otherKeywords.push(keyword);
+        }
+      });
+
+      if (otherKeywords.length > 0) {
+        const keywordRegex = otherKeywords.join("|");
+
+        categoryIds = await Category.find({
+          $or: [
+            { categoryName: { $regex: `^${keywordRegex}`, $options: "i" } },
+            {
+              categoryDescription: {
+                $regex: `^${keywordRegex}`,
+                $options: "i",
+              },
+            },
+          ],
+        }).distinct("_id");
+
+        subCategoryIds = await SubCategory.find({
+          $or: [
+            { subCategoryName: { $regex: `^${keywordRegex}`, $options: "i" } },
+            {
+              subCategoryDescription: {
+                $regex: `^${keywordRegex}`,
+                $options: "i",
+              },
+            },
+          ],
+        }).distinct("_id");
+
+        filter.$or = [
+          { productName: { $regex: `^${keywordRegex}`, $options: "i" } },
+          { productDescription: { $regex: `^${keywordRegex}`, $options: "i" } },
+          { productBrand: { $regex: `^${keywordRegex}`, $options: "i" } },
           {
-            subCategoryDescription: {
-              $regex: `^${searchQuery}$`,
+            productShortDescription: {
+              $regex: `^${keywordRegex}`,
               $options: "i",
             },
           },
-        ],
-      }).distinct("_id");
+          { productFeature: { $regex: `^${keywordRegex}`, $options: "i" } },
+          { categoryId: { $in: categoryIds } },
+          { subCategoryId: { $in: subCategoryIds } },
+        ];
+      }
 
-      filter.$or = [
-        { productName: { $regex: `^${searchQuery}$`, $options: "i" } },
-        { productDescription: { $regex: `^${searchQuery}$`, $options: "i" } },
-        { productBrand: { $regex: `^${searchQuery}$`, $options: "i" } },
-        {
-          productShortDescription: {
-            $regex: `^${searchQuery}$`,
-            $options: "i",
-          },
-        },
-        { categoryId: { $in: categoryIds } },
-        { subCategoryId: { $in: subCategoryIds } },
-      ];
+      if (productKeywords.length > 0) {
+        const productKeywordRegex = productKeywords.join("|");
+
+        if (!filter.$and) {
+          filter.$and = [];
+        }
+        filter.$and.push({
+          productName: { $regex: `^${productKeywordRegex}`, $options: "i" },
+        });
+      }
+
+      if (attributes.length > 0) {
+        attributes.forEach((attribute: any) => {
+          if (!filter.$and) {
+            filter.$and = [];
+          }
+          filter.$and.push({
+            productDescription: { $regex: attribute, $options: "i" },
+          });
+        });
+      }
+
+      if (priceRange) {
+        if (!filter.$and) {
+          filter.$and = [];
+        }
+        filter.$and.push({ productPrice: { $lte: priceRange.max } });
+      }
     }
 
-    // const skip = (page - 1) * limit;
     const totalCount = await Product.countDocuments(filter);
     const allProducts = await Product.find(filter);
-    // .skip(skip).limit(limit);
 
     if (allProducts.length > 0) {
       return res.json({
         message: SuccessMessages.ProductFoundSuccess,
-        status: 200,
+        status: StatusCodes.Success.Ok,
         success: true,
         data: {
           products: allProducts,
           totalCount,
-          currentPage: page,
-          // totalPages: Math.ceil(totalCount / limit),
         },
       });
     } else {
       return res.json({
         message: ErrorMessages.ProductNotFound,
         success: false,
-        status: 400,
+        status: StatusCodes.ClientError.NotFound,
       });
     }
   } catch (error) {
@@ -229,7 +289,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     return res.json({
       message: ErrorMessages.SomethingWentWrong,
       success: false,
-      status: 500,
+      status: StatusCodes.ServerError.InternalServerError,
     });
   }
 };

@@ -10,6 +10,7 @@ export interface IAuth extends Document {
   IsAdmin: boolean;
   role: Schema.Types.ObjectId;
   stripeUserId: string;
+  userLogin: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,11 +35,12 @@ const authSchema = new mongoose.Schema(
     address: {
       type: String,
     },
-    role: { type: Schema.Types.ObjectId, ref: "Role", required: false },
-    IsAdmin: {
+    userLogin: {
       type: Boolean,
       default: false,
     },
+    role: { type: Schema.Types.ObjectId, ref: "Role", required: false },
+    IsAdmin: { type: Boolean },
     stripeUserId: { type: String },
   },
   { timestamps: true }
