@@ -50,7 +50,7 @@ export const forgetPassword = async (req: Request, res: Response) => {
     transporter.sendMail(mailOptions, (err) => {
       if (err) {
         return res.json({
-          message: ErrorMessages.ForgotPasswordError,
+          message: ErrorMessages.EmailNotSend,
           status: StatusCodes.ClientError.BadRequest,
           success: false,
         });

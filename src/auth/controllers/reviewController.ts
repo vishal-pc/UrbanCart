@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import Auth from "../models/authModel";
-import Address from "../models/addressModel";
 import Product from "../../admin/models/productModel";
 import Review, { IReview } from "../models/reviewModel";
 import {
@@ -11,6 +10,9 @@ import {
 import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
 import cloudinary from "../../middleware/cloudflare/cloudinary";
 import Payment from "../models/paymentModel";
+import { transporter } from "../../middleware/mail/transPorter";
+import { sendMailForReview } from "../../template/reviewMail";
+import { envConfig } from "../../config/envConfig";
 
 //Add product review
 export const productReview = async (req: CustomRequest, res: Response) => {
@@ -73,6 +75,32 @@ export const productReview = async (req: CustomRequest, res: Response) => {
       productImg: secure_urls,
     });
     const saveUserReview = await newUserReview.save();
+
+    const foundUser = await Auth.findById({ _id: saveUserReview.userId });
+
+    const foundproduct = await Product.findById({ _id: productId });
+
+    const emailContant = sendMailForReview(
+      foundUser?.fullName || "User",
+      foundproduct?.productName || "Product"
+    );
+
+    const mailOptions = {
+      from: envConfig.Mail_From,
+      to: foundUser?.email || "",
+      subject: "Thank You for Choosing UrbanCart Product!",
+      html: emailContant,
+    };
+
+    transporter.sendMail(mailOptions, (err) => {
+      if (err) {
+        return res.json({
+          message: ErrorMessages.EmailNotSend,
+          status: StatusCodes.ClientError.BadRequest,
+          success: false,
+        });
+      }
+    });
     if (saveUserReview) {
       return res.json({
         message: SuccessMessages.ReviewSuccess,

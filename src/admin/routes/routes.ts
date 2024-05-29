@@ -79,7 +79,6 @@ adminRouter.post(
 );
 adminRouter.get(
   "/get-all-sub-categories",
-  verifyAuthToken(["admin"]),
   subCategoryController.getAllSubcategories
 );
 adminRouter.get(

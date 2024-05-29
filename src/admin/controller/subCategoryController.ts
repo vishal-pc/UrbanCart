@@ -121,14 +121,6 @@ export const getAllSubcategories = async (
   res: Response
 ) => {
   try {
-    const user = req.user as userType;
-    if (!user) {
-      return res.json({
-        message: ErrorMessages.UserNotFound,
-        success: false,
-        status: StatusCodes.ClientError.NotFound,
-      });
-    }
     const subcategories: ISubcategory[] = await SubCategory.find();
     return res.json({
       status: StatusCodes.Success.Ok,

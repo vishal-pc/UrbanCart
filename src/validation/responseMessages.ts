@@ -75,6 +75,7 @@ export const ErrorMessages = {
   UserNotFound: "User not found",
   EmailInvalid: "Invalid email format",
   EmalNotFound: "Email not found",
+  EmailNotSend: "Email not sent",
   UserExists: (email: string) => `This ${email} email is already exists`,
   IncorrectCredentials: "Incorrect email or password",
   PasswordRequirements:

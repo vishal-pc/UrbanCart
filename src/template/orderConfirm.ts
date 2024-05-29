@@ -19,7 +19,7 @@ export const orderConfirmTemplateToUser = async (
   return `<!DOCTYPE html>
   <html>
   <head>
-  <title></title>
+  <title>Order Confirmation Mail</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -229,7 +229,7 @@ export const orderConfirmTemplateToUser = async (
                       <tr>
                           <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 24px; padding: 5px 0 10px 0;">
                               <p style="font-size: 14px; font-weight: 800; line-height: 18px; color: #333333;">
-                                UrbanCart<br>1231 Street, Modal Gram<br>Ludhiana, Punjab-141002
+                                UrbanCart 🛒<br>1231 Street, Modal Gram<br>Ludhiana, Punjab-141002
                               </p>
                           </td>
                       </tr>
@@ -266,7 +266,7 @@ export const orderConfirmTemplateToAdmin = (
   return `<!DOCTYPE html>
   <html>
   <head>
-  <title></title>
+  <title>Order Confirmation Mail</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -434,7 +434,7 @@ export const orderConfirmTemplateToAdmin = (
                         <tr>
                             <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 24px; padding: 5px 0 10px 0; border-top: 3px solid #eeeeee;">
                                 <p style="font-size: 14px; font-weight: 800; line-height: 18px; color: #333333;">
-                                    UrbanCart<br>1231 Street, Modal Gram<br>Ludhiana, Punjab-141002
+                                    UrbanCart 🛒<br>1231 Street, Modal Gram<br>Ludhiana, Punjab-141002
                                 </p>
                             </td>
                         </tr>

@@ -305,19 +305,19 @@ export const updatePaymentIntent = async (stripePayment: any) => {
 
         setTimeout(async () => {
           let orderDataToUser = await orderConfirmTemplateToUser(
-            findUser?.fullName || "",
-            findUser?.email || "",
+            findUser?.fullName || "User",
+            findUser?.email || "abc@example.com",
             payment.totalCartAmount,
             date,
             time,
             dayTime,
             confirmOrderHTML,
             payment.orderNumber,
-            address?.streetAddress || "",
-            address?.nearByAddress || "",
-            address?.cityName || "",
-            address?.stateName || "",
-            address?.country || "",
+            address?.streetAddress || "abc",
+            address?.nearByAddress || "abc",
+            address?.cityName || "abc",
+            address?.stateName || "abc",
+            address?.country || "abc",
             address?.areaPincode || 0,
             address?.mobileNumber || 0
           );
@@ -331,23 +331,27 @@ export const updatePaymentIntent = async (stripePayment: any) => {
 
           transporter.sendMail(userMailOptions, (err) => {
             if (err) {
-              console.error("Error sending email to user:", err);
+              return {
+                message: ErrorMessages.EmailNotSend,
+                status: StatusCodes.ClientError.BadRequest,
+                success: false,
+              };
             }
           });
           let orderDataToAdmin = await orderConfirmTemplateToAdmin(
-            findUser?.fullName || "",
-            findUser?.email || "",
+            findUser?.fullName || "User",
+            findUser?.email || "abc@example.com",
             payment.totalCartAmount,
             date,
             time,
             dayTime,
             confirmOrderHTML,
             payment.orderNumber,
-            address?.streetAddress || "",
-            address?.nearByAddress || "",
-            address?.cityName || "",
-            address?.stateName || "",
-            address?.country || "",
+            address?.streetAddress || "abc",
+            address?.nearByAddress || "abc",
+            address?.cityName || "abc",
+            address?.stateName || "abc",
+            address?.country || "abc",
             address?.areaPincode || 0,
             address?.mobileNumber || 0
           );
@@ -363,7 +367,11 @@ export const updatePaymentIntent = async (stripePayment: any) => {
           };
           transporter.sendMail(adminMailOptions, (err) => {
             if (err) {
-              console.error("Error sending email to admin:", err);
+              return {
+                message: ErrorMessages.EmailNotSend,
+                status: StatusCodes.ClientError.BadRequest,
+                success: false,
+              };
             }
           });
         }, 15000);

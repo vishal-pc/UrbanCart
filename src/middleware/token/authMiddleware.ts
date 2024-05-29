@@ -2,7 +2,6 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { envConfig } from "../../config/envConfig";
 import { StatusCodes, ErrorMessages } from "../../validation/responseMessages";
-import Auth, { IAuth } from "../../auth/models/authModel";
 
 // Define a new interface that extends the Express Request interface
 export interface CustomRequest extends Request {
@@ -20,7 +19,7 @@ export interface userType {
 
 export const verifyAuthToken =
   (allowedRoles: string[]) =>
-  async (req: CustomRequest, res: Response, next: NextFunction) => {
+  (req: CustomRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -53,22 +52,6 @@ export const verifyAuthToken =
       if (decodedToken.exp && decodedToken.exp < currentTime) {
         return res.status(StatusCodes.ClientError.BadRequest).json({
           message: ErrorMessages.TokenExpire,
-          success: false,
-        });
-      }
-
-      const checkUser = (await Auth.findById(
-        decodedToken.userId
-      )) as IAuth | null;
-      if (!checkUser) {
-        return res.status(StatusCodes.ClientError.BadRequest).json({
-          message: ErrorMessages.UserNotFound,
-          success: false,
-        });
-      }
-      if (!checkUser.userLogin || !decodedToken.userLogin) {
-        return res.status(StatusCodes.ClientError.BadRequest).json({
-          message: ErrorMessages.UserLoginRequire,
           success: false,
         });
       }
