@@ -40,20 +40,25 @@ export const productReview = async (req: CustomRequest, res: Response) => {
         status: StatusCodes.ClientError.BadRequest,
       });
     }
-    const files = req.files as Express.Multer.File[];
-    if (!files || files.length === 0) {
+
+    const existingReview = await Review.findOne({ productId, userId });
+    if (existingReview) {
       return res.json({
-        message: ErrorMessages.FileUploadError,
+        message: ErrorMessages.ReviewAlreadyExists,
         success: false,
-        status: StatusCodes.ClientError.NotFound,
+        status: StatusCodes.ClientError.BadRequest,
       });
     }
 
-    const uploadPromises = files.map((file) =>
-      cloudinary.uploader.upload(file.path)
-    );
-    const uploadResults = await Promise.all(uploadPromises);
-    const secure_urls = uploadResults.map((result) => result.secure_url);
+    const files = req.files as Express.Multer.File[];
+    let secure_urls: string[] = [];
+    if (files && files.length > 0) {
+      const uploadPromises = files.map((file) =>
+        cloudinary.uploader.upload(file.path)
+      );
+      const uploadResults = await Promise.all(uploadPromises);
+      secure_urls = uploadResults.map((result) => result.secure_url);
+    }
 
     const userEligbleForReview = await Payment.findOne({
       buyerUserId: userId,
@@ -126,9 +131,16 @@ export const productReview = async (req: CustomRequest, res: Response) => {
 };
 
 // Get all user product reviews
-export const getAllProductReviews = async (req: Request, res: Response) => {
+export const getAllReviewsOfSingleProduct = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const reviews = await Review.find({}).populate("userId", "fullName");
+    const { productId } = req.params;
+    const reviews = await Review.find({ productId }).populate(
+      "userId",
+      "fullName"
+    );
     if (!reviews || reviews.length === 0) {
       return res.json({
         message: ErrorMessages.ReviewNotFound,
@@ -146,6 +158,7 @@ export const getAllProductReviews = async (req: Request, res: Response) => {
                 _id: user._id,
                 fullName: user.fullName,
                 address: user?.address,
+                profileImg: user?.profileImg,
               }
             : null,
           productId: review.productId,
@@ -163,46 +176,6 @@ export const getAllProductReviews = async (req: Request, res: Response) => {
       success: true,
       status: StatusCodes.Success.Ok,
       data: reviewData,
-    });
-  } catch (error) {
-    console.error("Error in submiting product review:", error);
-    return res.json({
-      message: ErrorMessages.SomethingWentWrong,
-      success: false,
-      status: StatusCodes.ServerError.InternalServerError,
-    });
-  }
-};
-
-// Chekc for eligible for review submit
-export const checkReviewForSubmit = async (
-  req: CustomRequest,
-  res: Response
-) => {
-  try {
-    const user = req.user as userType;
-    if (!user) {
-      return res.json({
-        message: ErrorMessages.UserNotFound,
-        success: false,
-        status: StatusCodes.ClientError.NotFound,
-      });
-    }
-    const userId = user.userId;
-    const { productId } = req.params;
-    const userEligbleForReview = await Payment.findOne({
-      buyerUserId: userId,
-      "totalProduct.productId": productId,
-    });
-    if (!userEligbleForReview) {
-      return res.json({
-        message: ErrorMessages.UserNotEligibleForReview,
-        success: false,
-        status: StatusCodes.ClientError.NotFound,
-      });
-    }
-    return res.json({
-      success: true,
     });
   } catch (error) {
     console.error("Error in submiting product review:", error);
