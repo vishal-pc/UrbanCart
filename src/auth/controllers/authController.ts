@@ -116,6 +116,7 @@ export const getUserById = async (req: CustomRequest, res: Response) => {
       email: foundedUser.email,
       mobileNumber: foundedUser.mobileNumber || "null",
       profileImg: foundedUser.profileImg || "null",
+      address: foundedUser.address || "null",
       role: foundedUser.role,
       createdAt: foundedUser.createdAt,
       updatedAt: foundedUser.updatedAt,
