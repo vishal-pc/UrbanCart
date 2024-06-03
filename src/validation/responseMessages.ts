@@ -59,6 +59,7 @@ export const SuccessMessages = {
   WishlistDelete: "Wishlist removed",
   ReviewSuccess: "Review added successfully",
   ReviewFound: "Review found",
+  ContactUs: "Thank you for your feedback, We will contact you soon!",
 };
 
 export const ErrorMessages = {
@@ -122,7 +123,9 @@ export const ErrorMessages = {
   WishlistAlreadyExist: "This product already in you wishlist",
   ReviewNotFound: "Review not found",
   ReviewAddError: "Review not added",
+  ReviewAlreadyExists: "Review already exists",
   UserNotEligibleForReview: "You haven't purchase this product",
   UserLoginCheck: "Please login first to add or by this product",
   UserLoginRequire: "Please login first",
+  ContactUsError: "Error in submitting feedback",
 };

@@ -11,6 +11,7 @@ import Auth from "../../auth/models/authModel";
 import Category, { ICategories } from "../models/categoriesModel";
 import SubCategory, { ISubcategory } from "../models/subCategoriesModels";
 import { parseSearchQuery } from "../../helpers/randomNumber";
+import { shuffleArray } from "../../helpers/helper";
 
 // Create a new product
 export const createProduct = async (req: CustomRequest, res: Response) => {
@@ -266,14 +267,15 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
     const totalCount = await Product.countDocuments(filter);
     const allProducts = await Product.find(filter);
+    const shuffledProducts = shuffleArray(allProducts);
 
-    if (allProducts.length > 0) {
+    if (shuffledProducts.length > 0) {
       return res.json({
         message: SuccessMessages.ProductFoundSuccess,
         status: StatusCodes.Success.Ok,
         success: true,
         data: {
-          products: allProducts,
+          products: shuffledProducts,
           totalCount,
         },
       });

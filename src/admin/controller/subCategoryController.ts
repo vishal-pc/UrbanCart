@@ -9,6 +9,7 @@ import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
 import SubCategory, { ISubcategory } from "../models/subCategoriesModels";
 import Auth from "../../auth/models/authModel";
 import cloudinary from "../../middleware/cloudflare/cloudinary";
+import { shuffleArray } from "../../helpers/helper";
 
 // Create a new category
 export const createSubCategory = async (req: CustomRequest, res: Response) => {
@@ -122,11 +123,12 @@ export const getAllSubcategories = async (
 ) => {
   try {
     const subcategories: ISubcategory[] = await SubCategory.find();
+    const shuffledSubcategories = shuffleArray(subcategories);
     return res.json({
       status: StatusCodes.Success.Ok,
       message: SuccessMessages.SubCategoriesFoundSuccess,
       success: true,
-      data: subcategories.map((subcategory) => ({
+      data: shuffledSubcategories.map((subcategory) => ({
         _id: subcategory._id,
         subCategoryName: subcategory.subCategoryName,
         subCategoryDescription: subcategory.subCategoryDescription,

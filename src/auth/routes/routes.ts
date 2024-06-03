@@ -9,6 +9,7 @@ import * as pdfController from "../controllers/pdfController";
 import * as addressController from "../controllers/addressController";
 import * as wishlistController from "../controllers/wishlistController";
 import * as reviewController from "../controllers/reviewController";
+import * as contactUsEmailController from "../controllers/contactUsController";
 
 const authRouter = express.Router();
 
@@ -163,14 +164,16 @@ authRouter.post(
   reviewController.productReview
 );
 authRouter.get(
-  "/get-all-reviews",
+  "/get-all-reviews/:productId",
   verifyAuthToken(["user"]),
-  reviewController.getAllProductReviews
+  reviewController.getAllReviewsOfSingleProduct
 );
-authRouter.get(
-  "/get-review/:productId",
+
+// Contact user routes
+authRouter.post(
+  "/submit-feedback",
   verifyAuthToken(["user"]),
-  reviewController.checkReviewForSubmit
+  contactUsEmailController.contactUsEmail
 );
 
 export default authRouter;

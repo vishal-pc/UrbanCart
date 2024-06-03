@@ -93,41 +93,43 @@ export const getUserWishlist = async (req: CustomRequest, res: Response) => {
     }
     const userId = user.userId;
 
-    const findUserWishlist = await WishList.findOne({ buyerUserId: userId });
-    if (!findUserWishlist) {
+    const userWishlists = await WishList.find({ buyerUserId: userId });
+    if (!userWishlists || userWishlists.length === 0) {
       return res.json({
         message: ErrorMessages.WishlistNotFound,
         success: false,
         status: StatusCodes.ClientError.NotFound,
       });
     } else {
-      const buyeruserDetails = await Auth.findById({
-        _id: findUserWishlist.buyerUserId,
-      });
-      const productDetails = await Product.findById({
-        _id: findUserWishlist.productId,
-      });
+      const wishlistDetails = await Promise.all(
+        userWishlists.map(async (wishlist) => {
+          const buyeruserDetails = await Auth.findById(wishlist.buyerUserId);
+          const productDetails = await Product.findById(wishlist.productId);
+
+          return {
+            _id: wishlist._id,
+            buyerUserId: {
+              _id: wishlist.buyerUserId,
+              fullName: buyeruserDetails?.fullName,
+            },
+            productId: {
+              _id: wishlist.productId,
+              productName: productDetails?.productName,
+              productPrice: productDetails?.productPrice,
+              productDescription: productDetails?.productDescription,
+              productImg: productDetails?.productImg,
+            },
+            createdAt: wishlist.createdAt,
+            updatedAt: wishlist.updatedAt,
+          };
+        })
+      );
 
       return res.json({
         message: SuccessMessages.WishlistFound,
         success: true,
         status: StatusCodes.Success.Ok,
-        data: {
-          _id: findUserWishlist._id,
-          buyerUserId: {
-            _id: findUserWishlist.buyerUserId._id,
-            fullName: buyeruserDetails?.fullName,
-          },
-          productId: {
-            _id: findUserWishlist.productId._id,
-            productName: productDetails?.productName,
-            productPrice: productDetails?.productPrice,
-            productDescription: productDetails?.productDescription,
-            productImg: productDetails?.productImg,
-          },
-          createdAt: findUserWishlist.createdAt,
-          updatedAt: findUserWishlist.updatedAt,
-        },
+        data: wishlistDetails,
       });
     }
   } catch (error) {
