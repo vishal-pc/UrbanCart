@@ -61,6 +61,7 @@ export const authRegister = async (req: Request, res: Response) => {
       password: hashedPassword,
       role: defaultRole,
       userLogin: false,
+      IsAdmin: false,
     };
 
     const userSaved = await Auth.create(newUser);
