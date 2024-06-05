@@ -165,7 +165,6 @@ authRouter.post(
 );
 authRouter.get(
   "/get-all-reviews/:productId",
-  verifyAuthToken(["user"]),
   reviewController.getAllReviewsOfSingleProduct
 );
 
