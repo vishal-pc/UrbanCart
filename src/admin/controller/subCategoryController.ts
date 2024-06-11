@@ -123,12 +123,11 @@ export const getAllSubcategories = async (
 ) => {
   try {
     const subcategories: ISubcategory[] = await SubCategory.find();
-    const shuffledSubcategories = shuffleArray(subcategories);
     return res.json({
       status: StatusCodes.Success.Ok,
       message: SuccessMessages.SubCategoriesFoundSuccess,
       success: true,
-      data: shuffledSubcategories.map((subcategory) => ({
+      data: subcategories.map((subcategory) => ({
         _id: subcategory._id,
         subCategoryName: subcategory.subCategoryName,
         subCategoryDescription: subcategory.subCategoryDescription,
