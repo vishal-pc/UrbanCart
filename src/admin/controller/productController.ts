@@ -267,15 +267,14 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
     const totalCount = await Product.countDocuments(filter);
     const allProducts = await Product.find(filter);
-    const shuffledProducts = shuffleArray(allProducts);
 
-    if (shuffledProducts.length > 0) {
+    if (allProducts.length > 0) {
       return res.json({
         message: SuccessMessages.ProductFoundSuccess,
         status: StatusCodes.Success.Ok,
         success: true,
         data: {
-          products: shuffledProducts,
+          products: allProducts,
           totalCount,
         },
       });
