@@ -19,7 +19,19 @@ export interface IPayment extends Document {
   paymentStatus: "Pending" | "Completed" | "Canceled";
   orderNumber: string;
   stripePayment: string;
-  addressId: Schema.Types.ObjectId;
+  userAddress: Array<{
+    _id: any;
+    addressId: Schema.Types.ObjectId;
+    mobileNumber: number;
+    country: string;
+    stateId: number;
+    stateName: string;
+    cityId: number;
+    cityName: string;
+    streetAddress: string;
+    nearByAddress: string;
+    areaPincode: number;
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -78,11 +90,24 @@ const PaymentSchema = new mongoose.Schema(
     stripePayment: {
       type: Schema.Types.Mixed,
     },
-    addressId: {
-      type: Schema.Types.ObjectId,
-      ref: "Address",
-      required: false,
-    },
+    userAddress: [
+      {
+        addressId: {
+          type: Schema.Types.ObjectId,
+          ref: "Address",
+          required: false,
+        },
+        mobileNumber: { type: Number },
+        country: { type: String },
+        stateId: { type: Number },
+        stateName: { type: String },
+        cityId: { type: Number },
+        cityName: { type: String },
+        streetAddress: { type: String },
+        nearByAddress: { type: String },
+        areaPincode: { type: Number },
+      },
+    ],
   },
   { timestamps: true }
 );

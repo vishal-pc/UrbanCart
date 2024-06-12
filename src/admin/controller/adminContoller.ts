@@ -229,10 +229,14 @@ export const getTotalOrderDetails = async (req: Request, res: Response) => {
       },
       addressId: {
         addressId: payment?._id,
-        cityName: (payment?.addressId as any as IAddress)?.cityName,
-        stateName: (payment?.addressId as any as IAddress)?.stateName,
-        streetAddress: (payment?.addressId as any as IAddress)?.streetAddress,
-        nearByAddress: (payment?.addressId as any as IAddress)?.nearByAddress,
+        cityName: (payment?.userAddress[0].addressId as any as IAddress)
+          ?.cityName,
+        stateName: (payment?.userAddress[0].addressId as any as IAddress)
+          ?.stateName,
+        streetAddress: (payment?.userAddress[0].addressId as any as IAddress)
+          ?.streetAddress,
+        nearByAddress: (payment?.userAddress[0].addressId as any as IAddress)
+          ?.nearByAddress,
       },
       totalProduct: payment?.totalProduct,
       createdAt: payment?.createdAt,

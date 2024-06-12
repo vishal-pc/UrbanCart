@@ -27,7 +27,7 @@ const stripe = new Stripe(envConfig.Stripe_Secret_key, {
 // Process payment and save payment details
 export const processPayment = async (req: CustomRequest, res: Response) => {
   try {
-    const { totalProduct, totalCartAmount, addressId } = req.body;
+    const { totalProduct, totalCartAmount, userAddress } = req.body;
     const user = req.user as userType;
     if (!user) {
       return res.json({
@@ -76,6 +76,15 @@ export const processPayment = async (req: CustomRequest, res: Response) => {
       })
     );
 
+    const detailedAddress = await Promise.all(
+      userAddress.map(async (address: any) => {
+        await Address.findById(address.addressId);
+        return {
+          ...address,
+        };
+      })
+    );
+
     const orderNumber = generateRandomNumber();
     const existingPaymentOrderNumber = await Payment.findOne({
       orderNumber: orderNumber,
@@ -96,7 +105,18 @@ export const processPayment = async (req: CustomRequest, res: Response) => {
         })),
         stripeUserId: customerId,
         orderNumber: orderNumber,
-        addressId: addressId,
+        userAddress: detailedAddress.map((address) => ({
+          addressId: address.addressId,
+          mobileNumber: address.mobileNumber,
+          country: address.country,
+          stateId: address.stateId,
+          stateName: address.stateName,
+          cityId: address.cityId,
+          cityName: address.cityName,
+          streetAddress: address.streetAddress,
+          nearByAddress: address.nearByAddress,
+          areaPincode: address.areaPincode,
+        })),
         totalCartAmount,
       });
 
@@ -196,14 +216,6 @@ export const getPaymentById = async (req: Request, res: Response) => {
         status: StatusCodes.ServerError.InternalServerError,
       });
     }
-    const addressDetails = await Address.findById({ _id: payment.addressId });
-    if (!addressDetails) {
-      return res.json({
-        message: ErrorMessages.AddressNotFound,
-        success: false,
-        status: StatusCodes.ClientError.NotFound,
-      });
-    }
     const formattedPayment = {
       _id: payment._id,
       buyerUserDetails: {
@@ -211,16 +223,7 @@ export const getPaymentById = async (req: Request, res: Response) => {
         fullName: buyerUserDetails.fullName,
         email: buyerUserDetails.email,
       },
-      addressDetails: {
-        addressId: addressDetails?._id,
-        streetAddress: addressDetails.streetAddress,
-        nearByAddress: addressDetails.nearByAddress,
-        cityName: addressDetails.cityName,
-        stateName: addressDetails.stateName,
-        country: addressDetails.country,
-        areaPincode: addressDetails.areaPincode,
-        mobileNumber: addressDetails.mobileNumber,
-      },
+      addressDetails: payment.userAddress,
       totalProduct: payment.totalProduct,
       totalCartAmount: payment.totalCartAmount,
       paymentStatus: payment.paymentStatus,
@@ -301,7 +304,6 @@ export const updatePaymentIntent = async (stripePayment: any) => {
         </tr>
           `;
         }
-        const address = await Address.findById({ _id: payment.addressId });
 
         setTimeout(async () => {
           let orderDataToUser = await orderConfirmTemplateToUser(
@@ -313,13 +315,13 @@ export const updatePaymentIntent = async (stripePayment: any) => {
             dayTime,
             confirmOrderHTML,
             payment.orderNumber,
-            address?.streetAddress || "abc",
-            address?.nearByAddress || "abc",
-            address?.cityName || "abc",
-            address?.stateName || "abc",
-            address?.country || "abc",
-            address?.areaPincode || 0,
-            address?.mobileNumber || 0
+            payment.userAddress[0].streetAddress || "abc",
+            payment.userAddress[0].nearByAddress || "abc",
+            payment.userAddress[0].cityName || "abc",
+            payment.userAddress[0].stateName || "abc",
+            payment.userAddress[0].country || "abc",
+            payment.userAddress[0].areaPincode || 0,
+            payment.userAddress[0].mobileNumber || 0
           );
 
           const userMailOptions = {
@@ -347,13 +349,13 @@ export const updatePaymentIntent = async (stripePayment: any) => {
             dayTime,
             confirmOrderHTML,
             payment.orderNumber,
-            address?.streetAddress || "abc",
-            address?.nearByAddress || "abc",
-            address?.cityName || "abc",
-            address?.stateName || "abc",
-            address?.country || "abc",
-            address?.areaPincode || 0,
-            address?.mobileNumber || 0
+            payment.userAddress[0].streetAddress || "abc",
+            payment.userAddress[0].nearByAddress || "abc",
+            payment.userAddress[0].cityName || "abc",
+            payment.userAddress[0].stateName || "abc",
+            payment.userAddress[0].country || "abc",
+            payment.userAddress[0].areaPincode || 0,
+            payment.userAddress[0].mobileNumber || 0
           );
 
           const adminUsers = await Auth.find({ IsAdmin: true });
@@ -422,7 +424,7 @@ export const getPaymentDetails = async (req: CustomRequest, res: Response) => {
       _id: payment._id,
       totalProduct: payment.totalProduct,
       totalCartAmount: payment.totalCartAmount,
-      addressId: payment.addressId,
+      userAddress: payment.userAddress,
       paymentStatus: payment.paymentStatus,
       buyerUserId: payment.buyerUserId,
       createdAt: payment.createdAt,

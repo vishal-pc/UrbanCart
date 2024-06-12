@@ -17,7 +17,7 @@ export const emailValidate = (email: string) => {
 
 // mobile number validation
 export const validateMobileNumber = (mobileNumber: string): boolean => {
-  const indianMobileRegex = /^[789]\d{9}$/;
+  const indianMobileRegex = /^[6789]\d{9}$/;
   return indianMobileRegex.test(mobileNumber);
 };
 

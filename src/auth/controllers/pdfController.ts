@@ -90,13 +90,13 @@ export const downloadPdfInvoice = async (req: CustomRequest, res: Response) => {
         dayTime,
         productRowsHTML,
         orderNumber,
-        addressDetails.mobileNumber,
-        addressDetails.streetAddress,
-        addressDetails.nearByAddress,
-        addressDetails.cityName,
-        addressDetails.stateName,
-        addressDetails.areaPincode,
-        addressDetails.country
+        addressDetails[0].mobileNumber,
+        addressDetails[0].streetAddress,
+        addressDetails[0].nearByAddress,
+        addressDetails[0].cityName,
+        addressDetails[0].stateName,
+        addressDetails[0].areaPincode,
+        addressDetails[0].country
       );
 
       const browser = await puppeteer.launch();
