@@ -122,17 +122,11 @@ export const processPayment = async (req: CustomRequest, res: Response) => {
 
       const savedPayment = await newPayment.save();
 
-      const productMetadata = JSON.stringify(
-        totalProduct.map((product: any) => ({
-          productId: product.productId,
-          productName: product.productName,
-          productPrice: product.productPrice,
-          productQuantity: product.productQuantity,
-          productDescription: product.productDescription,
-          itemPrice: product.itemPrice,
-          cartId: product.cartId,
-        }))
-      );
+      // Store detailed product data in your database instead of metadata
+      const productIds = totalProduct
+        .map((product: any) => product.productId)
+        .join(",");
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: totalProduct.map((item: any) => ({
@@ -152,7 +146,7 @@ export const processPayment = async (req: CustomRequest, res: Response) => {
         client_reference_id: String(savedPayment._id),
         metadata: {
           userId: String(user.userId),
-          products: productMetadata,
+          productIds: productIds, // Store only product IDs
           totalCartAmount: String(savedPayment.totalCartAmount),
         },
       });
