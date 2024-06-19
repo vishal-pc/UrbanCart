@@ -35,7 +35,6 @@ export const contactUsEmail = async (req: CustomRequest, res: Response) => {
     } = req.body;
     const requiredFields = [
       "reasonForContact",
-      "productId",
       "userName",
       "userMobileNumber",
       "userEmail",
