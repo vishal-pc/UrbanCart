@@ -5,14 +5,14 @@ import {
   SuccessMessages,
 } from "../../validation/responseMessages";
 import Category, { ICategories } from "../models/categoriesModel";
-import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
+import { userType } from "../../middleware/token/authMiddleware";
 import SubCategory, { ISubcategory } from "../models/subCategoriesModels";
 import Auth from "../../auth/models/authModel";
 import cloudinary from "../../middleware/cloudflare/cloudinary";
 import { shuffleArray } from "../../helpers/helper";
 
 // Create a new category
-export const createSubCategory = async (req: CustomRequest, res: Response) => {
+export const createSubCategory = async (req: Request, res: Response) => {
   const { subCategoryName, subCategoryDescription, categoryName } = req.body;
   const file = req.file;
   try {
@@ -117,10 +117,7 @@ export const createSubCategory = async (req: CustomRequest, res: Response) => {
 };
 
 // Get all subcategories
-export const getAllSubcategories = async (
-  req: CustomRequest,
-  res: Response
-) => {
+export const getAllSubcategories = async (req: Request, res: Response) => {
   try {
     const subcategories: ISubcategory[] = await SubCategory.find();
     return res.json({
@@ -148,10 +145,7 @@ export const getAllSubcategories = async (
 };
 
 // Get subcategories by ID
-export const getSubcategoriesById = async (
-  req: CustomRequest,
-  res: Response
-) => {
+export const getSubcategoriesById = async (req: Request, res: Response) => {
   try {
     const { subCategoryId } = req.params;
     const user = req.user as userType;

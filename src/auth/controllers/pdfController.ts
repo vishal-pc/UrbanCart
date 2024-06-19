@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import axios from "axios";
 import puppeteer from "puppeteer";
 import moment from "moment-timezone";
@@ -10,7 +10,7 @@ import {
 import { envConfig } from "../../config/envConfig";
 import { downloadPdf } from "../../template/invoicePdf";
 import Invoice from "../models/invoiceModel";
-import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
+import { userType } from "../../middleware/token/authMiddleware";
 import cloudinary from "../../middleware/cloudflare/cloudinary";
 import { generateRandomNumber } from "../../helpers/randomNumber";
 
@@ -28,7 +28,7 @@ const generateUniqueOrderNumber = async () => {
 };
 
 // Download invoice in pdf
-export const downloadPdfInvoice = async (req: CustomRequest, res: Response) => {
+export const downloadPdfInvoice = async (req: Request, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {

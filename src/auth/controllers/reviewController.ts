@@ -7,7 +7,7 @@ import {
   ErrorMessages,
   SuccessMessages,
 } from "../../validation/responseMessages";
-import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
+import { userType } from "../../middleware/token/authMiddleware";
 import cloudinary from "../../middleware/cloudflare/cloudinary";
 import Payment from "../models/paymentModel";
 import { transporter } from "../../middleware/mail/transPorter";
@@ -15,7 +15,7 @@ import { sendMailForReview } from "../../template/reviewMail";
 import { envConfig } from "../../config/envConfig";
 
 //Add product review
-export const productReview = async (req: CustomRequest, res: Response) => {
+export const productReview = async (req: Request, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {

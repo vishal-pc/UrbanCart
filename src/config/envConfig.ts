@@ -23,6 +23,9 @@ export interface EnvConfig {
   Success_Redirect: string;
   Cancel_Redirect: string;
   Get_Payment_By_ID: string;
+  client_ID: string;
+  client_Secret: string;
+  client_Url:string;
 }
 
 export const envConfig: EnvConfig = {
@@ -48,4 +51,7 @@ export const envConfig: EnvConfig = {
   Success_Redirect: process.env.Success_Redirect || "defaultSecret",
   Cancel_Redirect: process.env.Cancel_Redirect || "defaultSecret",
   Get_Payment_By_ID: process.env.Get_Payment_By_ID || "defaultSecret",
+  client_ID: process.env.client_ID || "defaultSecret",
+  client_Secret: process.env.client_Secret || "defaultSecret",
+  client_Url: process.env.client_Url || "defaultSecret",
 };

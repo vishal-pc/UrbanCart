@@ -7,7 +7,7 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
-import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
+import { userType } from "../../middleware/token/authMiddleware";
 import Product from "../models/productModel";
 import Payment from "../../auth/models/paymentModel";
 import Address, { IAddress } from "../../auth/models/addressModel";
@@ -87,7 +87,7 @@ export const registerAdmin = async (req: Request, res: Response) => {
 };
 
 // Get all users
-export const getAllUsers = async (req: CustomRequest, res: Response) => {
+export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {

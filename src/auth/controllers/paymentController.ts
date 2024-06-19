@@ -6,7 +6,7 @@ import {
   ErrorMessages,
   SuccessMessages,
 } from "../../validation/responseMessages";
-import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
+import { userType } from "../../middleware/token/authMiddleware";
 import { envConfig } from "../../config/envConfig";
 import Cart from "../models/cartModel";
 import Stripe from "stripe";
@@ -25,7 +25,7 @@ const stripe = new Stripe(envConfig.Stripe_Secret_key, {
 });
 
 // Process payment and save payment details
-export const processPayment = async (req: CustomRequest, res: Response) => {
+export const processPayment = async (req: Request, res: Response) => {
   try {
     const { totalProduct, totalCartAmount, userAddress } = req.body;
     const user = req.user as userType;
@@ -388,7 +388,7 @@ export const updatePaymentIntent = async (stripePayment: any) => {
 };
 
 // Get all payment details
-export const getPaymentDetails = async (req: CustomRequest, res: Response) => {
+export const getPaymentDetails = async (req: Request, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {

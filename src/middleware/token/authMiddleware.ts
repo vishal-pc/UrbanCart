@@ -1,12 +1,12 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { envConfig } from "../../config/envConfig";
 import { StatusCodes, ErrorMessages } from "../../validation/responseMessages";
 
 // Define a new interface that extends the Express Request interface
-export interface CustomRequest extends Request {
-  user?: userType;
-}
+// export interface CustomRequest extends Request {
+//   user?: userType;
+// }
 
 export interface userType {
   exp: number;
@@ -19,7 +19,7 @@ export interface userType {
 
 export const verifyAuthToken =
   (allowedRoles: string[]) =>
-  (req: CustomRequest, res: Response, next: NextFunction) => {
+  (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {

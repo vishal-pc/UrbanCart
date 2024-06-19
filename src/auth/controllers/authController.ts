@@ -7,7 +7,7 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
-import { CustomRequest, userType } from "../../middleware/token/authMiddleware";
+import { userType } from "../../middleware/token/authMiddleware";
 import { Role } from "../../admin/models/roleModel";
 
 // User Register
@@ -89,7 +89,7 @@ export const authRegister = async (req: Request, res: Response) => {
 };
 
 // Get auth user By id
-export const getUserById = async (req: CustomRequest, res: Response) => {
+export const getUserById = async (req: Request, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {

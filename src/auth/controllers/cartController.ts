@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
+import { userType } from "../../middleware/token/authMiddleware";
 import Cart from "../models/cartModel";
 import Product from "../../admin/models/productModel";
 import {
@@ -10,7 +10,7 @@ import {
 import Auth from "../models/authModel";
 
 // Add product to cart
-export const addToCart = async (req: CustomRequest, res: Response) => {
+export const addToCart = async (req: Request, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {
@@ -124,7 +124,7 @@ export const addToCart = async (req: CustomRequest, res: Response) => {
 };
 
 // Get user all cart items
-export const getAllCartItems = async (req: CustomRequest, res: Response) => {
+export const getAllCartItems = async (req: Request, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {
@@ -217,10 +217,7 @@ export const getAllCartItems = async (req: CustomRequest, res: Response) => {
 };
 
 // Get user cart item by id
-export const getUserCartItemById = async (
-  req: CustomRequest,
-  res: Response
-) => {
+export const getUserCartItemById = async (req: Request, res: Response) => {
   try {
     const { cartId } = req.params;
     const user = req.user as userType;
@@ -308,10 +305,7 @@ export const getUserCartItemById = async (
 };
 
 // Remove product quantity from cart
-export const removeProductQuantity = async (
-  req: CustomRequest,
-  res: Response
-) => {
+export const removeProductQuantity = async (req: Request, res: Response) => {
   try {
     const { cartItemId } = req.params;
     const user = req.user as userType;
@@ -364,10 +358,7 @@ export const removeProductQuantity = async (
 };
 
 // Update cart item quantity
-export const updateCartItemQuantity = async (
-  req: CustomRequest,
-  res: Response
-) => {
+export const updateCartItemQuantity = async (req: Request, res: Response) => {
   try {
     const { cartId } = req.params;
     const user = req.user as userType;
@@ -425,7 +416,7 @@ export const updateCartItemQuantity = async (
 };
 
 // Delete cart item
-export const deleteCartItem = async (req: CustomRequest, res: Response) => {
+export const deleteCartItem = async (req: Request, res: Response) => {
   try {
     const { cartId } = req.params;
     const user = req.user as userType;

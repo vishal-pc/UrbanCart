@@ -11,6 +11,7 @@ export interface IAuth extends Document {
   role: Schema.Types.ObjectId;
   stripeUserId: string;
   userLogin: boolean;
+  provider:string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,6 +34,9 @@ const authSchema = new mongoose.Schema(
       type: String,
     },
     address: {
+      type: String,
+    },
+    provider: {
       type: String,
     },
     userLogin: {
