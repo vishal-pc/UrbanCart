@@ -162,7 +162,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
 // Get all products
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
-    const { searchQuery } = req.query;
+    const { searchQuery, page: rawPage, limit: rawLimit } = req.query;
+    const page: number = rawPage ? parseInt(rawPage as string, 10) : 1;
+    const limit: number = rawLimit ? parseInt(rawLimit as string, 10) : 10;
     let filter: any = {};
 
     const distinctProductNames = await Product.distinct("productName");
@@ -175,12 +177,10 @@ export const getAllProducts = async (req: Request, res: Response) => {
       const parsedQuery = parseSearchQuery(searchQuery as string);
       const { keywords, priceRange, attributes } = parsedQuery;
 
-      let categoryIds: string[] = [];
-      let subCategoryIds: string[] = [];
       let productKeywords: string[] = [];
       let otherKeywords: string[] = [];
 
-      keywords.forEach((keyword: any) => {
+      for (const keyword of keywords) {
         if (
           distinctProductNames.includes(keyword) ||
           distinctCategoryNames.includes(keyword) ||
@@ -190,12 +190,12 @@ export const getAllProducts = async (req: Request, res: Response) => {
         } else {
           otherKeywords.push(keyword);
         }
-      });
+      }
 
       if (otherKeywords.length > 0) {
         const keywordRegex = otherKeywords.join("|");
 
-        categoryIds = await Category.find({
+        const categories = await Category.find({
           $or: [
             { categoryName: { $regex: `^${keywordRegex}`, $options: "i" } },
             {
@@ -207,7 +207,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
           ],
         }).distinct("_id");
 
-        subCategoryIds = await SubCategory.find({
+        const subCategories = await SubCategory.find({
           $or: [
             { subCategoryName: { $regex: `^${keywordRegex}`, $options: "i" } },
             {
@@ -230,43 +230,33 @@ export const getAllProducts = async (req: Request, res: Response) => {
             },
           },
           { productFeature: { $regex: `^${keywordRegex}`, $options: "i" } },
-          { categoryId: { $in: categoryIds } },
-          { subCategoryId: { $in: subCategoryIds } },
+          { categoryId: { $in: categories } },
+          { subCategoryId: { $in: subCategories } },
         ];
       }
 
       if (productKeywords.length > 0) {
         const productKeywordRegex = productKeywords.join("|");
-
-        if (!filter.$and) {
-          filter.$and = [];
-        }
-        filter.$and.push({
-          productName: { $regex: `^${productKeywordRegex}`, $options: "i" },
-        });
+        filter.productName = {
+          $regex: `^${productKeywordRegex}`,
+          $options: "i",
+        };
       }
 
       if (attributes.length > 0) {
-        attributes.forEach((attribute: any) => {
-          if (!filter.$and) {
-            filter.$and = [];
-          }
-          filter.$and.push({
-            productDescription: { $regex: attribute, $options: "i" },
-          });
-        });
+        filter.$and = attributes.map((attribute: string) => ({
+          productDescription: { $regex: attribute, $options: "i" },
+        }));
       }
 
       if (priceRange) {
-        if (!filter.$and) {
-          filter.$and = [];
-        }
-        filter.$and.push({ productPrice: { $lte: priceRange.max } });
+        filter.productPrice = { $lte: priceRange.max };
       }
     }
 
+    const skip = (page - 1) * limit;
     const totalCount = await Product.countDocuments(filter);
-    const allProducts = await Product.find(filter);
+    const allProducts = await Product.find(filter).skip(skip).limit(limit);
 
     if (allProducts.length > 0) {
       return res.json({
@@ -276,6 +266,8 @@ export const getAllProducts = async (req: Request, res: Response) => {
         data: {
           products: allProducts,
           totalCount,
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
         },
       });
     } else {
