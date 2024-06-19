@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
     ports:
-      - 8080:8080
+      - 5000:5000
     volumes:
       - .:/app
 # 1 Run compose file for build :- docker-compose up --build -d
