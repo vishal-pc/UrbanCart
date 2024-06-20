@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { userType } from "./../../middleware/token/authMiddleware";
+import {
+  userType,
+  CustomRequest,
+} from "./../../middleware/token/authMiddleware";
 import Address from "../models/addressModel";
 import {
   SuccessMessages,
@@ -9,7 +12,7 @@ import {
 import { validateMobileNumber, validatePinCode } from "../../helpers/helper";
 
 // Saved User address
-export const saveUserAddress = async (req: Request, res: Response) => {
+export const saveUserAddress = async (req: CustomRequest, res: Response) => {
   try {
     const {
       mobileNumber,
@@ -104,7 +107,7 @@ export const saveUserAddress = async (req: Request, res: Response) => {
 };
 
 // get all user address
-export const getAllUsersAddress = async (req: Request, res: Response) => {
+export const getAllUsersAddress = async (req: CustomRequest, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {
@@ -140,7 +143,7 @@ export const getAllUsersAddress = async (req: Request, res: Response) => {
 };
 
 // get user address by id
-export const getUserAddressById = async (req: Request, res: Response) => {
+export const getUserAddressById = async (req: CustomRequest, res: Response) => {
   try {
     const { addressId } = req.params;
     const user = req.user as userType;

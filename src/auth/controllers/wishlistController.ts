@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { userType } from "../../middleware/token/authMiddleware";
+import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
 import Product from "../../admin/models/productModel";
 import {
   StatusCodes,
@@ -10,7 +10,7 @@ import Auth from "../models/authModel";
 import WishList from "../models/wishlistModel";
 
 // Add to wishlist
-export const addToWishlist = async (req: Request, res: Response) => {
+export const addToWishlist = async (req: CustomRequest, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {
@@ -81,7 +81,7 @@ export const addToWishlist = async (req: Request, res: Response) => {
 };
 
 // Get user wishlist
-export const getUserWishlist = async (req: Request, res: Response) => {
+export const getUserWishlist = async (req: CustomRequest, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {

@@ -6,15 +6,14 @@ import {
   ErrorMessages,
 } from "../../validation/responseMessages";
 import cloudinary from "../../middleware/cloudflare/cloudinary";
-import { userType } from "../../middleware/token/authMiddleware";
+import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
 import Auth from "../../auth/models/authModel";
 import Category, { ICategories } from "../models/categoriesModel";
 import SubCategory, { ISubcategory } from "../models/subCategoriesModels";
 import { parseSearchQuery } from "../../helpers/randomNumber";
-import { shuffleArray } from "../../helpers/helper";
 
 // Create a new product
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: CustomRequest, res: Response) => {
   const user = req.user as userType;
   if (!user) {
     return res.json({

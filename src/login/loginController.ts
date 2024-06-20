@@ -8,6 +8,8 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../validation/responseMessages";
+import { Role } from "../admin/models/roleModel";
+import admin from "../middleware/firebase/firebase";
 
 // User Login
 export const authLogin = async (req: Request, res: Response) => {
@@ -69,5 +71,47 @@ export const authLogin = async (req: Request, res: Response) => {
       success: false,
       status: StatusCodes.ServerError.InternalServerError,
     });
+  }
+};
+
+// goole login
+export const googlelogin = async (req: Request, res: Response) => {
+  const googleToken = req.body.token;
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(googleToken);
+    const { uid, name, email, firebase } = decodedToken;
+    const sign_in_provider = firebase.sign_in_provider;
+    const defaultRole = await Role.findOne({ role: "user" });
+    let user = await Auth.findOne({ uid }).populate("role", "role");
+    if (!user) {
+      user = await Auth.create({
+        uid: uid,
+        email: email,
+        fullName: name,
+        role: defaultRole,
+        provider: sign_in_provider,
+        userLogin: true,
+      });
+    }
+    const token = jwt.sign(
+      {
+        userId: user?._id,
+        fullName: user?.fullName,
+        email: user?.email,
+        role: user?.role,
+        userLogin: user?.userLogin,
+      },
+      envConfig.Jwt_Secret,
+      { expiresIn: envConfig.Jwt_Expiry_Hours }
+    );
+    return res.status(200).json({
+      message: SuccessMessages.SignInSuccess,
+      status: StatusCodes.Success.Ok,
+      success: true,
+      token,
+    });
+  } catch (error) {
+    console.error("Error verifying Google token:", error);
+    res.status(401).json({ error: "Unauthorized" });
   }
 };

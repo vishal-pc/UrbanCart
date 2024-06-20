@@ -13,7 +13,7 @@ import { sendMailForPassword } from "../../template/forgetPassMail";
 import Category from "../../admin/models/categoriesModel";
 import SubCategory from "../../admin/models/subCategoriesModels";
 import Product from "../../admin/models/productModel";
-import { userType } from "../../middleware/token/authMiddleware";
+import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
 import cloudinary from "../../middleware/cloudflare/cloudinary";
 
 const otpStore: any = {};
@@ -140,7 +140,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 };
 
 // Change password for user and admin
-export const changePassword = async (req: Request, res: Response) => {
+export const changePassword = async (req: CustomRequest, res: Response) => {
   try {
     const { oldPassword, newPassword, confirmPassword } = req.body;
     const user = req.user as userType;
@@ -220,7 +220,7 @@ export const changePassword = async (req: Request, res: Response) => {
 };
 
 // update user profile
-export const updateUserProfile = async (req: Request, res: Response) => {
+export const updateUserProfile = async (req: CustomRequest, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {

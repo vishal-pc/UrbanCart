@@ -7,7 +7,7 @@ import {
   SuccessMessages,
   ErrorMessages,
 } from "../../validation/responseMessages";
-import { userType } from "../../middleware/token/authMiddleware";
+import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
 import Product from "../models/productModel";
 import Payment from "../../auth/models/paymentModel";
 import Address, { IAddress } from "../../auth/models/addressModel";
@@ -87,7 +87,7 @@ export const registerAdmin = async (req: Request, res: Response) => {
 };
 
 // Get all users
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (req: CustomRequest, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {
@@ -121,11 +121,11 @@ export const getAllUsers = async (req: Request, res: Response) => {
       });
     }
 
-    const filteredUsers = users.filter(
-      (u: IAuth) => u._id.toString() !== userId
-    );
+    // const filteredUsers = users.filter(
+    //   (u: IAuth) => u._id.toString() !== userId
+    // );
 
-    const userData = filteredUsers.map((user: IAuth) => ({
+    const userData = users.map((user: IAuth) => ({
       _id: user._id,
       fullName: user.fullName,
       email: user.email,
@@ -137,7 +137,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
       updatedAt: user.updatedAt,
     }));
 
-    const totalCount = filteredUsers.length;
+    const totalCount = users.length;
 
     return res.json({
       message: SuccessMessages.UserFound,

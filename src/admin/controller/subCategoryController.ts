@@ -5,14 +5,13 @@ import {
   SuccessMessages,
 } from "../../validation/responseMessages";
 import Category, { ICategories } from "../models/categoriesModel";
-import { userType } from "../../middleware/token/authMiddleware";
+import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
 import SubCategory, { ISubcategory } from "../models/subCategoriesModels";
 import Auth from "../../auth/models/authModel";
 import cloudinary from "../../middleware/cloudflare/cloudinary";
-import { shuffleArray } from "../../helpers/helper";
 
 // Create a new category
-export const createSubCategory = async (req: Request, res: Response) => {
+export const createSubCategory = async (req: CustomRequest, res: Response) => {
   const { subCategoryName, subCategoryDescription, categoryName } = req.body;
   const file = req.file;
   try {
@@ -145,7 +144,10 @@ export const getAllSubcategories = async (req: Request, res: Response) => {
 };
 
 // Get subcategories by ID
-export const getSubcategoriesById = async (req: Request, res: Response) => {
+export const getSubcategoriesById = async (
+  req: CustomRequest,
+  res: Response
+) => {
   try {
     const { subCategoryId } = req.params;
     const user = req.user as userType;

@@ -6,12 +6,12 @@ import {
   SuccessMessages,
 } from "../../validation/responseMessages";
 import Category, { ICategories } from "../models/categoriesModel";
-import { userType } from "../../middleware/token/authMiddleware";
+import { userType, CustomRequest } from "../../middleware/token/authMiddleware";
 import Auth from "../../auth/models/authModel";
 import cloudinary from "../../middleware/cloudflare/cloudinary";
 
 // Create a new category
-export const createCategory = async (req: Request, res: Response) => {
+export const createCategory = async (req: CustomRequest, res: Response) => {
   const { categoryName, categoryDescription } = req.body;
   const file = req.file;
   try {
@@ -91,7 +91,7 @@ export const createCategory = async (req: Request, res: Response) => {
 };
 
 // Get all categories
-export const getAllCategories = async (req: Request, res: Response) => {
+export const getAllCategories = async (req: CustomRequest, res: Response) => {
   try {
     const user = req.user as userType;
     if (!user) {
@@ -125,7 +125,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
 };
 
 // Get category by id
-export const getCategoryById = async (req: Request, res: Response) => {
+export const getCategoryById = async (req: CustomRequest, res: Response) => {
   try {
     const { categoryId } = req.params;
     const user = req.user as userType;
