@@ -15,3 +15,6 @@ services:
       - .:/app
 # 1 Run compose file for build :- docker-compose up --build -d
 # 2 Stop compose file :- docker-compose down
+# 3 Docker logs :- docker logs container-id
+# 4 Docker stop :- docker stop
+# 5 Docker remove :- docker rm container-id
