@@ -82,7 +82,10 @@ export const googlelogin = async (req: Request, res: Response) => {
     const { uid, name, email, firebase } = decodedToken;
     const sign_in_provider = firebase.sign_in_provider;
     const defaultRole = await Role.findOne({ role: "user" });
-    let user = await Auth.findOne({ uid }).populate("role", "role");
+    let user = await Auth.findOne({ $or: [{ uid }, { email }] }).populate(
+      "role",
+      "role"
+    );
     if (!user) {
       user = await Auth.create({
         uid: uid,
@@ -100,6 +103,8 @@ export const googlelogin = async (req: Request, res: Response) => {
         email: user?.email,
         role: user?.role,
         userLogin: user?.userLogin,
+        provider: user?.provider,
+        uid: user?.uid,
       },
       envConfig.Jwt_Secret,
       { expiresIn: envConfig.Jwt_Expiry_Hours }
