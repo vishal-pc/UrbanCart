@@ -94,6 +94,8 @@ export const googlelogin = async (req: Request, res: Response) => {
         role: defaultRole,
         provider: sign_in_provider,
         userLogin: true,
+        IsAdmin: false,
+        password: "no-password-user-logged-in-with-google",
       });
     }
     const token = jwt.sign(
