@@ -177,15 +177,6 @@ export const getTotalOrderDetails = async (req: Request, res: Response) => {
         ],
       }).distinct("_id");
 
-      const findAddressDetails = await Address.find({
-        $or: [
-          { cityName: { $regex: `^${searchQuery}$`, $options: "i" } },
-          { stateName: { $regex: `^${searchQuery}$`, $options: "i" } },
-          { streetAddress: { $regex: `^${searchQuery}$`, $options: "i" } },
-          { nearByAddress: { $regex: `^${searchQuery}$`, $options: "i" } },
-        ],
-      }).distinct("_id");
-
       filter.$or = [
         { buyerUserId: { $in: buyerUserDetails } },
         {
@@ -193,7 +184,6 @@ export const getTotalOrderDetails = async (req: Request, res: Response) => {
             $elemMatch: { productId: { $in: findProductDetails } },
           },
         },
-        { addressId: { $in: findAddressDetails } },
       ];
       const searchNumber = Number(searchQuery);
       if (!isNaN(searchNumber)) {
@@ -209,9 +199,7 @@ export const getTotalOrderDetails = async (req: Request, res: Response) => {
       ...filter,
       paymentStatus: "Pending",
     });
-    const allPayments = await Payment.find(filter)
-      .populate("buyerUserId")
-      .populate("addressId");
+    const allPayments = await Payment.find(filter).populate("buyerUserId");
 
     const paymentData = allPayments.map((payment) => ({
       _id: payment?._id,
@@ -226,17 +214,6 @@ export const getTotalOrderDetails = async (req: Request, res: Response) => {
         buyerUserId: payment?._id,
         email: (payment?.buyerUserId as any as IAuth)?.email,
         fullName: (payment?.buyerUserId as any as IAuth)?.fullName,
-      },
-      addressId: {
-        addressId: payment?._id,
-        cityName: (payment?.userAddress[0].addressId as any as IAddress)
-          ?.cityName,
-        stateName: (payment?.userAddress[0].addressId as any as IAddress)
-          ?.stateName,
-        streetAddress: (payment?.userAddress[0].addressId as any as IAddress)
-          ?.streetAddress,
-        nearByAddress: (payment?.userAddress[0].addressId as any as IAddress)
-          ?.nearByAddress,
       },
       totalProduct: payment?.totalProduct,
       createdAt: payment?.createdAt,
